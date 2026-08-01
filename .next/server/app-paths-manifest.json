@@ -4,6 +4,7 @@
   "/kitchen/page": "app/kitchen/page.js",
   "/api/orders/route": "app/api/orders/route.js",
   "/orb/page": "app/orb/page.js",
-  "/api/orders/[orderId]/route": "app/api/orders/[orderId]/route.js",
+  "/owner/page": "app/owner/page.js",
+  "/manager/page": "app/manager/page.js",
   "/api/menu/route": "app/api/menu/route.js"
 }

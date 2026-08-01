@@ -103,5 +103,31 @@
     ],
     "status": "accepted",
     "tableNumber": "Parcel"
+  },
+  {
+    "id": 7,
+    "createdAt": "2026-08-01T13:41:02.816Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "name": "Cappuccino",
+        "price": 3.5,
+        "quantity": 2
+      },
+      {
+        "id": 3,
+        "name": "Latte",
+        "price": 4,
+        "quantity": 2
+      }
+    ],
+    "status": "served",
+    "tableNumber": "23"
   }
 ]
