@@ -13,9 +13,8 @@ export default function ManagerPage() {
   }, []);
 
   const addMenuItem = () => {
-    // In a real app, you would send this to the server
     const newItem = { 
-      id: Date.now(), // temporary id
+      id: Date.now(),
       name: newItemName, 
       price: parseFloat(newItemPrice) 
     };
@@ -25,47 +24,56 @@ export default function ManagerPage() {
   };
 
   const removeMenuItem = (itemId) => {
-    // In a real app, you would send this to the server
     setMenu(menu.filter(item => item.id !== itemId));
   };
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "#e9e3d9", minHeight: "100vh", fontFamily: "'Playfair Display', serif" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Manager Dashboard</h1>
+    <div className="p-5 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)]">
+      <h1 className="text-center mb-8 text-4xl font-bold text-[#333]">Manager Dashboard</h1>
 
-      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-        <h2 style={{ borderBottom: "2px solid #333", paddingBottom: "10px" }}>Menu Management</h2>
+      <div className="max-w-2xl mx-auto">
+        <h2 className="border-b-2 border-[#333] pb-2.5 text-2xl font-bold">Menu Management</h2>
 
-        <div style={{ marginBottom: "2rem" }}>
+        <div className="mb-8">
           {menu.map(item => (
-            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #ccc" }}>
+            <div key={item.id} className="flex justify-between items-center py-2.5 border-b border-gray-300">
               <span>{item.name} - ${item.price.toFixed(2)}</span>
-              <button onClick={() => removeMenuItem(item.id)}>Remove</button>
+              <button
+                onClick={() => removeMenuItem(item.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
+              >
+                Remove
+              </button>
             </div>
           ))}
         </div>
 
-        <div style={{ backgroundColor: "#f8f1e7", padding: "20px", borderRadius: "5px" }}>
-          <h3>Add New Menu Item</h3>
-          <div style={{ marginBottom: "1rem" }}>
+        <div className="bg-[#f8f1e7] p-5 rounded-md">
+          <h3 className="text-xl font-bold mb-4">Add New Menu Item</h3>
+          <div className="mb-4">
             <input
               type="text"
               placeholder="Item Name"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              style={{ padding: "10px", width: "calc(100% - 22px)" }}
+              className="p-2.5 w-full rounded-md border border-gray-300"
             />
           </div>
-          <div style={{ marginBottom: "1rem" }}>
+          <div className="mb-4">
             <input
               type="number"
               placeholder="Item Price"
               value={newItemPrice}
               onChange={(e) => setNewItemPrice(e.target.value)}
-              style={{ padding: "10px", width: "calc(100% - 22px)" }}
+              className="p-2.5 w-full rounded-md border border-gray-300"
             />
           </div>
-          <button onClick={addMenuItem}>Add Item</button>
+          <button
+            onClick={addMenuItem}
+            className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors"
+          >
+            Add Item
+          </button>
         </div>
       </div>
     </div>

@@ -1,9 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html,
 body {
   margin: 0;
-  background: #000;
+  background: #fff;
+  color: #333;
+  overflow-x: hidden;
+}
+
+@keyframes crossFade1 {
+  0%   { opacity: 1; }
+  40%  { opacity: 1; }
+  50%  { opacity: 0; }
+  90%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes crossFade2 {
+  0%   { opacity: 0; }
+  40%  { opacity: 0; }
+  50%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-cross-fade-1 {
+  animation: crossFade1 10s ease-in-out infinite;
+}
+
+.animate-cross-fade-2 {
+  animation: crossFade2 10s ease-in-out infinite;
 }

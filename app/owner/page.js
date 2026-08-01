@@ -6,9 +6,7 @@ export default function OwnerPage() {
   const [popularItems, setPopularItems] = useState([]);
 
   useEffect(() => {
-    // In a real app, you would fetch this data from your backend
     const fetchDashboardData = () => {
-      // Mock data for demonstration
       setDailySales(1250.75);
       setPopularItems([
         { name: "Espresso", count: 58 },
@@ -21,31 +19,20 @@ export default function OwnerPage() {
   }, []);
 
   return (
-    <div style={{ 
-      padding: "30px", 
-      backgroundColor: "#e9e3d9", 
-      minHeight: "100vh", 
-      fontFamily: "'Playfair Display', serif"
-    }}>
-      <h1 style={{ textAlign: "center", marginBottom: "3rem", fontSize: "2.5rem" }}>Owner's Dashboard</h1>
+    <div className="p-7 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)]">
+      <h1 className="text-center mb-12 text-4xl font-bold text-[#333]">Owner's Dashboard</h1>
 
-      <div style={{ 
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        gap: "30px",
-        maxWidth: "1200px",
-        margin: "0 auto"
-      }}>
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Daily Sales</h2>
-          <p style={styles.cardValue}>${dailySales.toFixed(2)}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 max-w-6xl mx-auto">
+        <div className="bg-[#f8f1e7] p-6 rounded-lg shadow-md">
+          <h2 className="border-b-2 border-[#333] pb-2.5 mb-5 text-2xl font-bold">Daily Sales</h2>
+          <p className="text-4xl font-bold text-center">${dailySales.toFixed(2)}</p>
         </div>
 
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Popular Items</h2>
-          <ul style={{ listStyle: "none", padding: 0 }}>
+        <div className="bg-[#f8f1e7] p-6 rounded-lg shadow-md">
+          <h2 className="border-b-2 border-[#333] pb-2.5 mb-5 text-2xl font-bold">Popular Items</h2>
+          <ul className="list-none p-0">
             {popularItems.map(item => (
-              <li key={item.name} style={styles.listItem}>
+              <li key={item.name} className="flex justify-between py-2 border-b border-gray-300">
                 <span>{item.name}</span>
                 <span>{item.count}</span>
               </li>
@@ -53,37 +40,11 @@ export default function OwnerPage() {
           </ul>
         </div>
 
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Real-time Occupancy</h2>
-          <p style={styles.cardValue}>75%</p> 
+        <div className="bg-[#f8f1e7] p-6 rounded-lg shadow-md">
+          <h2 className="border-b-2 border-[#333] pb-2.5 mb-5 text-2xl font-bold">Real-time Occupancy</h2>
+          <p className="text-4xl font-bold text-center">75%</p> 
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  card: {
-    backgroundColor: "#f8f1e7",
-    padding: "25px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-  },
-  cardTitle: {
-    borderBottom: "2px solid #333",
-    paddingBottom: "10px",
-    marginBottom: "20px",
-    fontSize: "1.5rem"
-  },
-  cardValue: {
-    fontSize: "2.5rem",
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  listItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "8px 0",
-    borderBottom: "1px solid #ddd"
-  }
-};

@@ -1,41 +1,18 @@
-"use client";
-import { useState, useEffect } from "react";
-
-function StatusPill({ status }) {
-  const style = {
-    padding: "5px 10px",
-    borderRadius: "15px",
-    color: "white",
-    fontWeight: "bold",
-  };
-
-  switch (status) {
-    case 'accepted':
-      style.backgroundColor = '#3498db'; // Blue
-      break;
-    case 'preparing':
-      style.backgroundColor = '#f1c40f'; // Yellow
-      break;
-    case 'ready':
-      style.backgroundColor = '#2ecc71'; // Green
-      break;
-    default:
-      style.backgroundColor = '#95a5a6'; // Gray
-  }
-
-  return <span style={style}>{status}</span>;
-}
+'use client';
+import { useState, useEffect } from 'react';
 
 export default function OrbPage() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    // In a real app, this would be a real-time subscription
     const interval = setInterval(() => {
       fetch('/api/orders')
         .then(res => res.json())
-        .then(data => setOrders(data));
-    }, 2000); // Poll every 2 seconds
+        .then(data => {
+          const readyOrders = data.filter(order => order.status === 'completed');
+          setOrders(readyOrders);
+        });
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
@@ -48,7 +25,7 @@ export default function OrbPage() {
       padding: "30px",
       fontFamily: "'Playfair Display', serif"
     }}>
-      <h1 style={{ textAlign: "center", fontSize: "3rem", marginBottom: "2rem" }}>Order Status Orb</h1>
+      <h1 style={{ textAlign: "center", fontSize: "3rem", marginBottom: "2rem" }}>Ready Orders</h1>
       
       <div style={{ 
         display: "grid",
@@ -59,13 +36,10 @@ export default function OrbPage() {
           <div key={order.id} style={{ 
             backgroundColor: "#2c3e50", 
             padding: "20px", 
-            borderRadius: "10px"
+            borderRadius: "10px",
+            textAlign: "center"
           }}>
-            <h2 style={{ borderBottom: "1px solid #7f8c8d", paddingBottom: "10px" }}>Order #{order.id}</h2>
-            <p>Table: {order.tableId || "Parcel"}</p>
-            <p style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              Status: <StatusPill status={order.status} />
-            </p>
+            <h2 style={{ fontSize: "2rem" }}>Order #{order.id} is Ready</h2>
           </div>
         ))}
       </div>

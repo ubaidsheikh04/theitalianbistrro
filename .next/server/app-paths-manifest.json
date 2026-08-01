@@ -1,3 +1,9 @@
 {
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/customer/page": "app/customer/page.js",
+  "/kitchen/page": "app/kitchen/page.js",
+  "/api/orders/route": "app/api/orders/route.js",
+  "/orb/page": "app/orb/page.js",
+  "/api/orders/[orderId]/route": "app/api/orders/[orderId]/route.js",
+  "/api/menu/route": "app/api/menu/route.js"
 }

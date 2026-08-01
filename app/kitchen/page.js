@@ -1,23 +1,43 @@
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
-function Order({ order, markAsCompleted }) {
+function Order({ order, markAsPreparing, markAsCompleted, markAsServed }) {
   return (
-    <div style={{
-      border: "1px solid #ccc",
-      padding: "20px",
-      marginBottom: "20px",
-      backgroundColor: "#f8f1e7",
-      borderRadius: "5px",
-    }}>
-      <h3 style={{ fontFamily: "'Playfair Display', serif" }}>Order #{order.id}</h3>
-      <p>Table: {order.tableId || "Parcel"}</p>
-      <ul>
+    <div className={`border border-gray-300 p-5 mb-5 rounded-md ${order.status === 'preparing' ? 'bg-yellow-100' : (order.status === 'completed' ? 'bg-green-100' : 'bg-[#f8f1e7]')}`}>
+      <h3 className="font-[var(--font-playfair)] text-2xl font-bold">Order #{order.id}</h3>
+      <p className="text-lg">Table: {order.tableNumber || 'Parcel'}</p>
+      <p className="text-lg">Status: <span className="font-bold">{order.status}</span></p>
+      <ul className="list-disc list-inside mt-2">
         {order.items.map((item, index) => (
-          <li key={index}>{item.name}</li>
+          <li key={index} className="text-base">{item.name} x {item.quantity}</li>
         ))}
       </ul>
-      <button onClick={() => markAsCompleted(order.id)}>Mark as Completed</button>
+      <div className="mt-4">
+        {order.status === 'accepted' && (
+          <button
+            onClick={() => markAsPreparing(order.id)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+          >
+            Mark as Preparing
+          </button>
+        )}
+        {order.status === 'preparing' && (
+          <button
+            onClick={() => markAsCompleted(order.id)}
+            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+          >
+            Mark as Completed
+          </button>
+        )}
+        {order.status === 'completed' && (
+          <button
+            onClick={() => markAsServed(order.id)}
+            className="bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors"
+          >
+            Mark as Served
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -25,25 +45,64 @@ function Order({ order, markAsCompleted }) {
 export default function KitchenPage() {
   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    // In a real app, you would fetch this from a database and use websockets for real-time updates
+  const fetchOrders = () => {
     fetch('/api/orders')
       .then(res => res.json())
-      .then(data => setOrders(data.filter(o => o.status === 'accepted')));
+      .then(data => {
+        const activeOrders = data.filter(o => o.status === 'accepted' || o.status === 'preparing' || o.status === 'completed');
+        setOrders(activeOrders);
+      })
+      .catch(error => console.error('Error fetching orders:', error));
+  };
+
+  useEffect(() => {
+    fetchOrders();
+    const intervalId = setInterval(fetchOrders, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
+  const updateOrderStatus = (orderId, status) => {
+    fetch(`/api/orders/${orderId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      }
+    )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+      fetchOrders();
+    })
+    .catch(error => {
+        console.error(`Error updating order status to ${status}:`, error);
+        alert(`Failed to update order status. Please try again.`);
+    });
+  };
+
+  const markAsPreparing = (orderId) => {
+    updateOrderStatus(orderId, 'preparing');
+  };
+
   const markAsCompleted = (orderId) => {
-    // In a real app, you would update the order status in the database
-    setOrders(orders.filter((order) => order.id !== orderId));
+    updateOrderStatus(orderId, 'completed');
+  };
+
+  const markAsServed = (orderId) => {
+    updateOrderStatus(orderId, 'served');
   };
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "#e9e3d9", minHeight: "100vh", fontFamily: "'Playfair Display', serif" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Kitchen Orders</h1>
+    <div className="p-5 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)]">
+      <h1 className="text-center mb-8 text-4xl font-bold text-[#333]">Kitchen Orders</h1>
       
-      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <div className="max-w-2xl mx-auto">
         {orders.map((order) => (
-          <Order key={order.id} order={order} markAsCompleted={markAsCompleted} />
+          <Order key={order.id} order={order} markAsPreparing={markAsPreparing} markAsCompleted={markAsCompleted} markAsServed={markAsServed} />
         ))}
       </div>
     </div>
