@@ -7,20 +7,21 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        'playfair-display': ['Playfair Display', 'serif'],
+      keyframes: {
+        crossFade1: {
+          '0%, 35%': { opacity: 1 },
+          '65%, 100%': { opacity: 0 },
+        },
+        crossFade2: {
+          '0%, 35%': { opacity: 0 },
+          '65%, 100%': { opacity: 1 },
+        },
       },
       animation: {
-        'fade-in-out-1': 'fadeInOut 10s infinite',
-        'fade-in-out-2': 'fadeInOut 10s infinite 5s',
-      },
-      keyframes: {
-        fadeInOut: {
-          '0%, 45%, 100%': { opacity: 0 },
-          '50%': { opacity: 1 },
-        },
+        'cross-fade-1': 'crossFade1 10s linear infinite',
+        'cross-fade-2': 'crossFade2 10s linear infinite',
       },
     },
   },
   plugins: [],
-}
+};
