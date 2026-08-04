@@ -34,7 +34,13 @@ function ConfirmationModal({ order, onConfirm, onCancel, total }) {
     const [isParcel, setIsParcel] = useState(false);
 
     const handleConfirm = () => {
-        const finalTableNumber = isParcel ? "Parcel" : tableNumber;
+        const finalTableNumber = isParcel ? "Parcel" : parseInt(tableNumber, 10);
+
+        if (!isParcel && (isNaN(finalTableNumber) || finalTableNumber < 1 || finalTableNumber > 10)) {
+            alert("Please enter a valid table number between 1 and 10.");
+            return;
+        }
+
         onConfirm(order, finalTableNumber);
     };
 
@@ -67,12 +73,14 @@ function ConfirmationModal({ order, onConfirm, onCancel, total }) {
                 <div className="mt-4">
                   <label htmlFor="tableNumber" className="block text-lg font-bold">Table Number</label>
                   <input 
-                    type="text" 
+                    type="number" 
                     id="tableNumber" 
                     value={tableNumber} 
                     onChange={(e) => setTableNumber(e.target.value)} 
                     className="w-full p-2 border border-gray-300 rounded-md mt-1"
                     disabled={isParcel}
+                    min="1"
+                    max="10"
                   />
                 </div>
                 <div className="flex justify-end mt-6">
@@ -128,7 +136,7 @@ export default function CustomerPage() {
   };
 
   const handlePlaceOrder = (finalOrder, tableNumber) => {
-    if (!tableNumber) {
+    if (!tableNumber && tableNumber !== 0) { // Also check for 0 if it's a valid input
       alert("Please enter a table number or select Parcel.");
       return;
     }

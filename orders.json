@@ -87,7 +87,7 @@
         "price": 4
       }
     ],
-    "status": "accepted",
+    "status": "served",
     "tableNumber": "2"
   },
   {
@@ -101,7 +101,7 @@
         "quantity": 1
       }
     ],
-    "status": "accepted",
+    "status": "served",
     "tableNumber": "Parcel"
   },
   {
@@ -129,5 +129,95 @@
     ],
     "status": "served",
     "tableNumber": "23"
+  },
+  {
+    "id": 8,
+    "createdAt": "2026-08-01T14:54:47.342Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 2
+      },
+      {
+        "id": 3,
+        "name": "Latte",
+        "price": 4,
+        "quantity": 1
+      }
+    ],
+    "status": "served",
+    "tableNumber": "2"
+  },
+  {
+    "id": 9,
+    "createdAt": "2026-08-01T15:06:55.582Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 1
+      }
+    ],
+    "status": "served",
+    "tableNumber": "1"
+  },
+  {
+    "id": 10,
+    "createdAt": "2026-08-01T15:14:46.398Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 1
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": "3"
+  },
+  {
+    "id": 11,
+    "createdAt": "2026-08-01T15:18:48.552Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 1
+      }
+    ],
+    "status": "preparing",
+    "tableNumber": "2"
+  },
+  {
+    "id": 12,
+    "createdAt": "2026-08-04T07:54:36.833Z",
+    "items": [
+      {
+        "id": 3,
+        "name": "Latte",
+        "price": 4,
+        "quantity": 3
+      }
+    ],
+    "status": "served",
+    "tableNumber": 8
+  },
+  {
+    "id": 13,
+    "createdAt": "2026-08-04T07:56:27.441Z",
+    "items": [
+      {
+        "id": 4,
+        "name": "Tiramisu",
+        "price": 6.5,
+        "quantity": 2
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": 8
   }
 ]

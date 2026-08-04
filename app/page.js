@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -175,6 +176,7 @@ export default function Page() {
             <h3 className="font-semibold text-lg text-[#c89d7c]">Company</h3>
             <ul className="mt-4 space-y-2">
               <li><a href="#">About Us</a></li>
+              <li><Link href="/owner">Owner Dashboard</Link></li>
               <li><a href="#">Privacy Policy</a></li>
               <li><a href="#">Terms & Condition</a></li>
             </ul>
