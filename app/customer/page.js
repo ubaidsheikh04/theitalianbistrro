@@ -102,10 +102,38 @@ function ConfirmationModal({ order, onConfirm, onCancel, total }) {
     );
 }
 
+function PostOrderModal({ onOk, onNotNow, orderId }) {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-[#f8f1e7] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#333]">
+                <h2 className="text-2xl font-bold mb-4 text-center">Your order has been confirmed.</h2>
+                {orderId && <p className="text-center font-bold text-xl">Your Order Number is: {orderId}</p>}
+                <p className="text-center mt-4">Please share your experience with us.</p>
+                <div className="flex justify-center items-center mt-6">
+                    <button
+                        onClick={onOk}
+                        className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors"
+                    >
+                        OK
+                    </button>
+                    <button
+                        onClick={onNotNow}
+                        className="ml-4 text-sm underline"
+                    >
+                        Not now
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function CustomerPage() {
   const [menu, setMenu] = useState([]);
   const [order, setOrder] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showPostOrderModal, setShowPostOrderModal] = useState(false);
+  const [confirmedOrderId, setConfirmedOrderId] = useState(null);
 
   useEffect(() => {
     fetch('/api/menu')
@@ -136,7 +164,7 @@ export default function CustomerPage() {
   };
 
   const handlePlaceOrder = (finalOrder, tableNumber) => {
-    if (!tableNumber && tableNumber !== 0) { // Also check for 0 if it's a valid input
+    if (!tableNumber && tableNumber !== 0) {
       alert("Please enter a table number or select Parcel.");
       return;
     }
@@ -165,8 +193,9 @@ export default function CustomerPage() {
       }
       return res.json();
     })
-    .then(() => {
-        alert('Order placed successfully!');
+    .then((data) => {
+        setConfirmedOrderId(data.order.id);
+        setShowPostOrderModal(true);
         setOrder([]);
         setShowConfirmation(false);
     })
@@ -211,6 +240,19 @@ export default function CustomerPage() {
             total={orderTotal}
             onConfirm={handlePlaceOrder}
             onCancel={() => setShowConfirmation(false)}
+        />
+      )}
+
+      {showPostOrderModal && (
+        <PostOrderModal 
+            orderId={confirmedOrderId}
+            onOk={() => {
+                window.location.href = 'https://search.google.com/local/writereview?placeid=ChIJew-CegCNwDsRwjr3NpyfcI8';
+            }}
+            onNotNow={() => {
+                setShowPostOrderModal(false);
+                setConfirmedOrderId(null);
+            }}
         />
       )}
     </div>

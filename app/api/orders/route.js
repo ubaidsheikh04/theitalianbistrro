@@ -10,6 +10,9 @@ const tablesFilePath = path.join(process.cwd(), 'tables.json');
 async function readData(filePath) {
     try {
         const fileContents = await fs.readFile(filePath, 'utf8');
+        if (!fileContents) {
+            return [];
+        }
         return JSON.parse(fileContents);
     } catch (error) {
         if (error.code === 'ENOENT') return [];

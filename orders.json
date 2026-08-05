@@ -189,7 +189,7 @@
         "quantity": 1
       }
     ],
-    "status": "preparing",
+    "status": "completed",
     "tableNumber": "2"
   },
   {
@@ -219,5 +219,87 @@
     ],
     "status": "accepted",
     "tableNumber": 8
+  },
+  {
+    "id": 14,
+    "createdAt": "2026-08-05T14:34:39.213Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "name": "Cappuccino",
+        "price": 3.5,
+        "quantity": 3
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": 5
+  },
+  {
+    "id": 15,
+    "createdAt": "2026-08-05T14:52:36.618Z",
+    "items": [
+      {
+        "id": 2,
+        "name": "Cappuccino",
+        "price": 3.5,
+        "quantity": 1
+      },
+      {
+        "id": 3,
+        "name": "Latte",
+        "price": 4,
+        "quantity": 1
+      }
+    ],
+    "status": "served",
+    "tableNumber": 9
+  },
+  {
+    "id": 16,
+    "createdAt": "2026-08-05T14:56:53.528Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 3
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": 9
+  },
+  {
+    "id": 17,
+    "createdAt": "2026-08-05T14:59:27.064Z",
+    "items": [
+      {
+        "id": 4,
+        "name": "Tiramisu",
+        "price": 6.5,
+        "quantity": 1
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": 9
+  },
+  {
+    "id": 18,
+    "createdAt": "2026-08-05T15:16:34.855Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 2
+      }
+    ],
+    "status": "served",
+    "tableNumber": 2
   }
-]
+]]

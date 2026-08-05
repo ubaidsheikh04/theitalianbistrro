@@ -7,6 +7,9 @@ const menuFilePath = path.join(process.cwd(), 'menu.json');
 async function readMenu() {
   try {
     const fileContents = await fs.readFile(menuFilePath, 'utf8');
+    if (!fileContents) {
+        return [];
+    }
     return JSON.parse(fileContents);
   } catch (error) {
     if (error.code === 'ENOENT') return []; // Return empty array if file doesn't exist

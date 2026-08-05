@@ -11,10 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/manager/page": [
+    "/customer/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/manager/page.js"
+      "static/chunks/app/customer/page.js"
     ],
     "/kitchen/page": [
       "static/chunks/webpack.js",
@@ -26,10 +26,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/orb/page.js"
     ],
-    "/customer/page": [
+    "/manager/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/customer/page.js"
+      "static/chunks/app/manager/page.js"
     ],
     "/owner/page": [
       "static/chunks/webpack.js",

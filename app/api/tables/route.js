@@ -6,8 +6,16 @@ import { withLock } from '@/utils/lock';
 const tablesFilePath = path.join(process.cwd(), 'tables.json');
 
 async function readTables() {
-    const fileContents = await fs.readFile(tablesFilePath, 'utf8');
-    return JSON.parse(fileContents);
+    try {
+        const fileContents = await fs.readFile(tablesFilePath, 'utf8');
+        if (!fileContents) {
+            return [];
+        }
+        return JSON.parse(fileContents);
+    } catch (error) {
+        if (error.code === 'ENOENT') return [];
+        throw error;
+    }
 }
 
 export async function GET() {
