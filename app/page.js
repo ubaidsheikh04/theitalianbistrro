@@ -1,238 +1,1044 @@
-import Image from "next/image";
-import Link from "next/link";
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 
 export default function Page() {
+  const desktopVideoRef = useRef(null);
+  const mobileVideoRef = useRef(null);
+  const heroRef = useRef(null);
+
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    const desktopVideo = desktopVideoRef.current;
+    const mobileVideo = mobileVideoRef.current;
+
+    if (!hero || !desktopVideo || !mobileVideo) return;
+
+    const PIXELS_PER_SECOND = 1000;
+
+    let animationHeight = 0;
+    let ticking = false;
+
+    /*
+     * ==========================================
+     * GET ACTIVE VIDEO
+     * ==========================================
+     */
+
+    const getActiveVideo = () => {
+      return window.innerWidth < 768
+        ? mobileVideo
+        : desktopVideo;
+    };
+
+
+    /*
+     * ==========================================
+     * TEXT ANIMATIONS
+     * ==========================================
+     */
+
+    const updateTextAnimations = (progress) => {
+      const burgerText =
+        document.getElementById('burger-text');
+
+      const pizzaText =
+        document.getElementById('pizza-text');
+
+      if (!burgerText || !pizzaText) return;
+
+
+      /*
+       * ========================================
+       * BURGER TEXT
+       *
+       * ENTER: 20%
+       * FULLY VISIBLE: 25%
+       * VANISH: 30%
+       * ========================================
+       */
+
+      let burgerOpacity = 0;
+      let burgerX = -100;
+
+      if (progress < 0.20) {
+
+        // Before 20%
+        burgerOpacity = 0;
+        burgerX = -100;
+
+      } else if (progress < 0.25) {
+
+        // 20% → 25%
+        // Slide in from left
+
+        const enterProgress =
+          (progress - 0.20) / 0.05;
+
+        const eased =
+          1 - Math.pow(
+            1 - enterProgress,
+            3
+          );
+
+        burgerX =
+          -100 + eased * 108;
+
+        burgerOpacity = eased;
+
+      } else if (progress < 0.30) {
+
+        // 25% → 30%
+        // Slide/fade out to left
+
+        const exitProgress =
+          (progress - 0.25) / 0.05;
+
+        const eased =
+          Math.pow(
+            exitProgress,
+            3
+          );
+
+        burgerX =
+          8 - eased * 108;
+
+        burgerOpacity =
+          1 - eased;
+
+      } else {
+
+        // After 30%
+        burgerOpacity = 0;
+        burgerX = -100;
+      }
+
+      burgerText.style.opacity =
+        burgerOpacity;
+
+      burgerText.style.transform =
+        `translateX(${burgerX}%) translateY(-50%)`;
+
+
+      /*
+       * ========================================
+       * PIZZA TEXT
+       *
+       * ENTER: 35%
+       * FULLY VISIBLE: 42.5%
+       * VANISH: 50%
+       * ========================================
+       */
+
+      let pizzaOpacity = 0;
+      let pizzaX = 100;
+
+      if (progress < 0.35) {
+
+        // Before 35%
+        pizzaOpacity = 0;
+        pizzaX = 100;
+
+      } else if (progress < 0.425) {
+
+        // 35% → 42.5%
+        // Slide in from right
+
+        const enterProgress =
+          (progress - 0.35) / 0.075;
+
+        const eased =
+          1 - Math.pow(
+            1 - enterProgress,
+            3
+          );
+
+        pizzaX =
+          100 - eased * 108;
+
+        pizzaOpacity = eased;
+
+      } else if (progress < 0.50) {
+
+        // 42.5% → 50%
+        // Slide/fade out to right
+
+        const exitProgress =
+          (progress - 0.425) / 0.075;
+
+        const eased =
+          Math.pow(
+            exitProgress,
+            3
+          );
+
+        pizzaX =
+          -8 + eased * 108;
+
+        pizzaOpacity =
+          1 - eased;
+
+      } else {
+
+        // After 50%
+        pizzaOpacity = 0;
+        pizzaX = 100;
+      }
+
+      pizzaText.style.opacity =
+        pizzaOpacity;
+
+      pizzaText.style.transform =
+        `translateX(${pizzaX}%) translateY(-50%)`;
+    };
+
+
+    /*
+     * ==========================================
+     * SETUP
+     * ==========================================
+     */
+
+    const setup = () => {
+      const video = getActiveVideo();
+
+      if (
+        !video.duration ||
+        !isFinite(video.duration)
+      ) {
+        return;
+      }
+
+      desktopVideo.pause();
+      mobileVideo.pause();
+
+      /*
+       * Total scroll distance required
+       * to scrub through the entire video.
+       */
+
+      animationHeight =
+        video.duration *
+        PIXELS_PER_SECOND;
+
+      /*
+       * Hero height.
+       */
+
+      hero.style.height =
+        `${animationHeight + window.innerHeight}px`;
+
+      update();
+    };
+
+
+    /*
+     * ==========================================
+     * MAIN UPDATE
+     * ==========================================
+     */
+
+    const update = () => {
+      ticking = false;
+
+      const video = getActiveVideo();
+
+      if (
+        !video.duration ||
+        !isFinite(video.duration) ||
+        animationHeight <= 0
+      ) {
+        return;
+      }
+
+      const scrollY =
+        window.scrollY;
+
+
+      /*
+       * ========================================
+       * VIDEO PROGRESS
+       * ========================================
+       */
+
+      const progress =
+        Math.max(
+          0,
+          Math.min(
+            1,
+            scrollY / animationHeight
+          )
+        );
+
+
+      /*
+       * ========================================
+       * VIDEO CURRENT TIME
+       * ========================================
+       */
+
+      const targetTime =
+        progress * video.duration;
+
+      if (
+        Math.abs(
+          video.currentTime -
+          targetTime
+        ) > 0.005
+      ) {
+        video.currentTime =
+          targetTime;
+      }
+
+
+      /*
+       * ========================================
+       * VIDEO POSITION
+       * ========================================
+       */
+
+      if (
+        scrollY < animationHeight
+      ) {
+
+        /*
+         * Keep videos locked
+         * to viewport.
+         */
+
+        desktopVideo.style.position =
+          'fixed';
+
+        desktopVideo.style.top =
+          '0';
+
+        desktopVideo.style.left =
+          '0';
+
+
+        mobileVideo.style.position =
+          'fixed';
+
+        mobileVideo.style.top =
+          '0';
+
+        mobileVideo.style.left =
+          '0';
+
+      } else {
+
+        /*
+         * Release video after
+         * animation completes.
+         */
+
+        desktopVideo.style.position =
+          'absolute';
+
+        desktopVideo.style.top =
+          `${animationHeight}px`;
+
+        desktopVideo.style.left =
+          '0';
+
+
+        mobileVideo.style.position =
+          'absolute';
+
+        mobileVideo.style.top =
+          `${animationHeight}px`;
+
+        mobileVideo.style.left =
+          '0';
+      }
+
+
+      /*
+       * ========================================
+       * UPDATE TEXT ANIMATIONS
+       * ========================================
+       */
+
+      updateTextAnimations(
+        progress
+      );
+    };
+
+
+    /*
+     * ==========================================
+     * SCROLL HANDLER
+     * ==========================================
+     */
+
+    const handleScroll = () => {
+      if (!ticking) {
+
+        window.requestAnimationFrame(
+          update
+        );
+
+        ticking = true;
+      }
+    };
+
+
+    /*
+     * ==========================================
+     * VIDEO METADATA
+     * ==========================================
+     */
+
+    if (
+      desktopVideo.readyState >= 1
+    ) {
+      setup();
+    } else {
+      desktopVideo.addEventListener(
+        'loadedmetadata',
+        setup
+      );
+    }
+
+
+    if (
+      mobileVideo.readyState >= 1
+    ) {
+      setup();
+    } else {
+      mobileVideo.addEventListener(
+        'loadedmetadata',
+        setup
+      );
+    }
+
+
+    /*
+     * ==========================================
+     * EVENT LISTENERS
+     * ==========================================
+     */
+
+    window.addEventListener(
+      'scroll',
+      handleScroll,
+      {
+        passive: true,
+      }
+    );
+
+    window.addEventListener(
+      'resize',
+      setup
+    );
+
+
+    /*
+     * ==========================================
+     * CLEANUP
+     * ==========================================
+     */
+
+    return () => {
+
+      desktopVideo.removeEventListener(
+        'loadedmetadata',
+        setup
+      );
+
+      mobileVideo.removeEventListener(
+        'loadedmetadata',
+        setup
+      );
+
+      window.removeEventListener(
+        'scroll',
+        handleScroll
+      );
+
+      window.removeEventListener(
+        'resize',
+        setup
+      );
+    };
+
+  }, []);
+
+
+  /*
+   * ==========================================
+   * NAVIGATION
+   * ==========================================
+   */
+
+  const scrollTo = (id) => {
+
+    const element =
+      document.getElementById(id);
+
+    if (element) {
+
+      setMenuOpen(false);
+
+      element.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+  };
+
+
+  /*
+   * ==========================================
+   * PAGE
+   * ==========================================
+   */
+
   return (
-    <>
-      <div className="relative h-screen overflow-hidden">
-        {/* Images */}
-        <Image
-          src="/2.png"
-          alt="Background 1"
-          fill
-          priority
-          className="absolute inset-0 object-cover animate-cross-fade-1"
-        />
+    <main>
 
-        <Image
-          src="/3.png"
-          alt="Background 2"
-          fill
-          priority
-          className="absolute inset-0 object-cover animate-cross-fade-2"
-        />
+      {/* ======================================
+          HEADER
+          ====================================== */}
 
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/35 z-10" />
+      <header
+        className="
+          fixed
+          top-0
+          left-0
+          right-0
+          z-50
+          px-5
+          py-4
+          text-white
+        "
+      >
 
-        {/* Hero Content */}
-        <div className="absolute z-20 top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center px-6">
+        <nav
+          className="
+            mx-auto
+            flex
+            max-w-7xl
+            items-center
+            justify-between
+          "
+        >
+
+          {/* LOGO */}
+
           <h1
-            className="text-white font-[var(--font-playfair)]
-                       text-6xl md:text-8xl lg:text-9xl
-                       font-semibold tracking-wide"
-            style={{
-              textShadow: "0 5px 25px rgba(0,0,0,0.8)",
-            }}
+            className="
+              text-xl
+              font-bold
+              sm:text-2xl
+            "
           >
-            The Italian Bistrro
+            The Italian Bistro
           </h1>
 
-          <p
-            className="mt-5 text-white italic
-                       text-xl md:text-3xl"
-            style={{
-              textShadow: "0 3px 15px rgba(0,0,0,0.9)",
-            }}
+
+          {/* DESKTOP NAVIGATION */}
+
+          <ul
+            className="
+              hidden
+              items-center
+              space-x-6
+              md:flex
+            "
           >
-            Authentic Italian Cuisine
-          </p>
 
-          <div className="mt-8 w-24 h-px bg-white"></div>
+            <li>
+              <a
+                href="#about"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo('about');
+                }}
+                className="hover:underline"
+              >
+                About Us
+              </a>
+            </li>
 
-          <p
-            className="mt-8 uppercase
-                       tracking-[0.6em]
-                       text-white
-                       text-sm md:text-lg"
-            style={{
-              textShadow: "0 3px 15px rgba(0,0,0,0.9)",
-            }}
+            <li>
+              <a
+                href="#what-we-serve"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo('what-we-serve');
+                }}
+                className="hover:underline"
+              >
+                What We Serve
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#reviews"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo('reviews');
+                }}
+                className="hover:underline"
+              >
+                Reviews
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#location"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo('location');
+                }}
+                className="hover:underline"
+              >
+                Location
+              </a>
+            </li>
+
+          </ul>
+
+
+          {/* MOBILE MENU BUTTON */}
+
+          <button
+            type="button"
+            onClick={() =>
+              setMenuOpen(!menuOpen)
+            }
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-full
+              bg-black/20
+              text-2xl
+              md:hidden
+            "
+            aria-label="Toggle menu"
           >
-            EST. 2026 • FINE DINING
-          </p>
-        </div>
-      </div>
+            ☰
+          </button>
 
-      {/* About Us Section */}
-      <div className="bg-[#f8f1e7] py-20 px-6">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* Image Grid */}
-            <div className="grid grid-cols-2 gap-4">
-                <Image
-                    src="/2.png"
-                    width={300}
-                    height={300}
-                    alt="Restaurant interior"
-                    className="rounded-lg object-cover aspect-square"
-                />
-                <Image
-                    src="/3.png"
-                    width={300}
-                    height={300}
-                    alt="Italian food"
-                    className="rounded-lg object-cover aspect-square"
-                />
-                <Image
-                    src="/3.png"
-                    width={300}
-                    height={300}
-                    alt="Restaurant detail"
-                    className="rounded-lg object-cover aspect-square"
-                />
-                <Image
-                    src="/2.png"
-                    width={300}
-                    height={300}
-                    alt="More food"
-                    className="rounded-lg object-cover aspect-square"
-                />
+        </nav>
+
+
+        {/* ==================================
+            MOBILE MENU
+            ================================== */}
+
+        {menuOpen && (
+
+          <div
+            className="
+              absolute
+              left-0
+              right-0
+              top-full
+              bg-black/90
+              px-6
+              py-6
+              backdrop-blur-md
+              md:hidden
+            "
+          >
+
+            <div
+              className="
+                flex
+                flex-col
+                gap-5
+                text-lg
+              "
+            >
+
+              <button
+                onClick={() =>
+                  scrollTo('about')
+                }
+                className="text-left"
+              >
+                About Us
+              </button>
+
+              <button
+                onClick={() =>
+                  scrollTo('what-we-serve')
+                }
+                className="text-left"
+              >
+                What We Serve
+              </button>
+
+              <button
+                onClick={() =>
+                  scrollTo('reviews')
+                }
+                className="text-left"
+              >
+                Reviews
+              </button>
+
+              <button
+                onClick={() =>
+                  scrollTo('location')
+                }
+                className="text-left"
+              >
+                Location
+              </button>
+
             </div>
 
-            {/* Text Content */}
-            <div className="text-left">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#555]">About Us</h2>
-              <h3 className="text-4xl font-[var(--font-playfair)] text-[#333] mt-2">Welcome to The Italian Bistro</h3>
-              <p className="mt-6 text-base text-[#555] leading-relaxed">
-                At The Italian Bistro, we believe dining is more than just food – it is an experience. Our name is a promise of a warm welcome, and that is exactly what we offer every guest who walks through our doors.
-              </p>
-              <p className="mt-4 text-base text-[#555] leading-relaxed">
-                Located in the heart of Flavor Town, we bring you the authentic essence of Italy through carefully crafted flavors, inviting ambiance, and heartfelt hospitality. Our team is passionate about creating a space where tradition meets modern comfort, a memorable culinary journey.
-              </p>
-              <div className="mt-8 flex items-center gap-4">
-                <div className="text-6xl font-bold text-[#333] font-[var(--font-playfair)] pr-4 border-r-2 border-[#c89d7c]">10</div>
-                <div>
-                  <span className="block text-md font-semibold text-[#333]">Years of</span>
-                  <span className="block text-md font-semibold uppercase tracking-wider text-[#333]">Culinary Experience</span>
-                </div>
-              </div>
-            </div>
+          </div>
+
+        )}
+
+      </header>
+
+
+      {/* ======================================
+          VIDEO SCROLL HERO
+          ====================================== */}
+
+      <section
+        ref={heroRef}
+        className="
+          relative
+          w-full
+        "
+      >
+
+        {/* DESKTOP VIDEO */}
+
+        <video
+          ref={desktopVideoRef}
+          src="/main.mp4"
+          muted
+          playsInline
+          preload="auto"
+          className="
+            hidden
+            h-screen
+            w-full
+            object-cover
+            md:block
+          "
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 10,
+          }}
+        />
+
+
+        {/* MOBILE VIDEO */}
+
+        <video
+          ref={mobileVideoRef}
+          src="/main-mobile.mp4"
+          muted
+          playsInline
+          preload="auto"
+          className="
+            block
+            h-[100dvh]
+            w-full
+            object-cover
+            md:hidden
+          "
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 10,
+          }}
+        />
+
+
+        {/* ==================================
+            BURGER TEXT
+            20% ENTER
+            25% FULL
+            30% EXIT
+            ================================== */}
+
+        <div
+          id="burger-text"
+          className="
+            pointer-events-none
+            fixed
+            left-0
+            top-1/2
+            z-20
+            w-[42%]
+            -translate-y-1/2
+            text-left
+            text-white
+            md:w-[35%]
+          "
+          style={{
+            opacity: 0,
+            transform:
+              'translateX(-100%) translateY(-50%)',
+          }}
+        >
+
+          <div
+            className="
+              px-6
+              md:px-12
+            "
+          >
+
+            <h2
+              className="
+                text-3xl
+                font-semibold
+                leading-tight
+                md:text-5xl
+              "
+            >
+              Mouthwatering
+              <br />
+              Burgers
+            </h2>
+
+            <p
+              className="
+                mt-3
+                text-sm
+                leading-relaxed
+                md:text-lg
+              "
+            >
+              Perfectly grilled.
+              <br />
+              Served with an ice-cold Coke.
+            </p>
+
+          </div>
+
         </div>
-      </div>
 
-      {/* What We Serve Section */}
-      <div className="py-20 px-6 text-center">
-        <h2 className="text-4xl font-[var(--font-playfair)] text-[#333]">What We Serve</h2>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div className="border p-6 rounded-lg">
-            <h3 className="text-2xl font-semibold">Pasta</h3>
-            <p className="mt-2">Classic Spaghetti Carbonara, Fettuccine Alfredo, and more.</p>
-          </div>
-          <div className="border p-6 rounded-lg">
-            <h3 className="text-2xl font-semibold">Pizza</h3>
-            <p className="mt-2">Margherita, Pepperoni, and specialty pizzas from our wood-fired oven.</p>
-          </div>
-          <div className="border p-6 rounded-lg">
-            <h3 className="text-2xl font-semibold">Desserts</h3>
-            <p className="mt-2">Tiramisu, Cannoli, and Panna Cotta to finish your meal.</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Reviews Section */}
-      <div className="bg-[#f8f1e7] py-20 px-6 text-center">
-        <h2 className="text-4xl font-[var(--font-playfair)] text-[#333]">Reviews</h2>
-        <div className="mt-8 max-w-2xl mx-auto">
-          <p className="text-lg text-[#555]">"The best Italian food I've had outside of Italy!" - Jane Doe</p>
-          <p className="mt-4 text-lg text-[#555]">"A wonderful atmosphere and even better food." - John Smith</p>
-        </div>
-      </div>
+        {/* ==================================
+            PIZZA TEXT
+            35% ENTER
+            42.5% FULL
+            50% EXIT
+            ================================== */}
 
-      {/* Location Section */}
-      <div className="bg-[#333] text-white py-20 px-6 text-center">
-        <h3 className="text-lg font-semibold uppercase tracking-[0.2em] text-[#c89d7c]">Our Location</h3>
-        <h2 className="text-5xl font-[var(--font-playfair)] mt-2">Find Us Here</h2>
-        <div className="mt-8 max-w-2xl mx-auto">
-            <iframe 
-                width="100%" 
-                height="150" 
-                style={{border:0, borderRadius: '12px'}} 
-                loading="lazy" 
-                allowFullScreen 
-                src="https://maps.google.com/maps?q=16.23095213194135,74.3440107738333&hl=en&z=14&output=embed">
-            </iframe>
-        </div>
-      </div>
+        <div
+          id="pizza-text"
+          className="
+            pointer-events-none
+            fixed
+            right-0
+            top-1/2
+            z-20
+            w-[42%]
+            -translate-y-1/2
+            text-right
+            text-white
+            md:w-[35%]
+          "
+          style={{
+            opacity: 0,
+            transform:
+              'translateX(100%) translateY(-50%)',
+          }}
+        >
 
-      {/* Footer */}
-      <footer className="bg-[#333] text-white pt-20 pb-8 px-6 border-t border-gray-700">
-        <div className="max-w-6xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-[var(--font-playfair)]">We look forward to your visit!</h2>
-        </div>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 text-left border-b border-gray-700 pb-8">
-          
-          {/* Company */}
-          <div>
-            <h3 className="font-semibold text-lg text-[#c89d7c]">Company</h3>
-            <ul className="mt-4 space-y-2">
-              <li><a href="#">About Us</a></li>
-              <li><Link href="/owner">Owner Dashboard</Link></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms & Condition</a></li>
-            </ul>
-          </div>
+          <div
+            className="
+              px-6
+              md:px-12
+            "
+          >
 
-          {/* Contact */}
-          <div>
-            <h3 className="font-semibold text-lg text-[#c89d7c]">Contact</h3>
-            <address className="mt-4 not-italic space-y-2">
-              <p>The Italian Bistro</p>
-              <p>321, ABC, Gadhinglaj.</p>
-              <p>411119</p>
-            </address>
-          </div>
+            <h2
+              className="
+                text-3xl
+                font-semibold
+                leading-tight
+                md:text-5xl
+              "
+            >
+              Italian Pizza
+            </h2>
 
-          {/* Opening Hours */}
-          <div>
-            <h3 className="font-semibold text-lg text-[#c89d7c]">Opening Hours</h3>
-            <div className="mt-4 space-y-2">
-              <p><span className="font-semibold">Tuesday - Sunday</span></p>
-              <p>6:00 PM – 11:00 PM</p>
-              <p><span className="font-semibold">Monday</span></p>
-              <p>Closed</p>
-            </div>
-          </div>
+            <p
+              className="
+                mt-3
+                text-sm
+                leading-relaxed
+                md:text-lg
+              "
+            >
+              Authentic flavors.
+              <br />
+              Paired with fresh cold coffee.
+            </p>
 
-          {/* Connect us */}
-          <div>
-            <h3 className="font-semibold text-lg text-[#c89d7c]">Connect us</h3>
-            <div className="mt-4 flex space-x-4">
-              <a href="#">IG</a>
-              <a href="#">FB</a>
-              <a href="#">WA</a>
-              <a href="#">EM</a>
-            </div>
-          </div>
-
-          {/* Restaurant Policy */}
-          <div>
-            <h3 className="font-semibold text-lg text-[#c89d7c]">Restaurant Policy</h3>
-            <div className="mt-4 space-y-2">
-                <p>No Pets</p>
-                <p>No Smoking</p>
-                <p className="mt-4">Reservations by phone and email only.</p>
-            </div>
           </div>
 
         </div>
 
-        <div className="max-w-6xl mx-auto flex justify-between items-center pt-8 text-sm">
-          <p>&copy; The Italian Bistro, All Right Reserved.</p>
-          <p>
-            Designed By <a href="https://wa.me/919175282915" target="_blank" rel="noopener noreferrer" className="text-[#c89d7c] hover:underline">ubaidSHEIKH</a>
-          </p>
-        </div>
+
+        {/* ==================================
+            SUBTLE DARK OVERLAY
+            ================================== */}
+
+        <div
+          className="
+            pointer-events-none
+            fixed
+            inset-0
+          "
+          style={{
+            zIndex: 15,
+            background:
+              'rgba(0, 0, 0, 0.15)',
+          }}
+        />
+
+      </section>
+
+
+      {/* ======================================
+          ABOUT
+          ====================================== */}
+
+      <section
+        id="about"
+        className="
+          relative
+          z-30
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-white
+        "
+      >
+        <h2
+          className="
+            text-5xl
+            font-bold
+          "
+        >
+          About Us
+        </h2>
+      </section>
+
+
+      {/* ======================================
+          WHAT WE SERVE
+          ====================================== */}
+
+      <section
+        id="what-we-serve"
+        className="
+          relative
+          z-30
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-gray-100
+        "
+      >
+        <h2
+          className="
+            text-5xl
+            font-bold
+          "
+        >
+          What We Serve
+        </h2>
+      </section>
+
+
+      {/* ======================================
+          REVIEWS
+          ====================================== */}
+
+      <section
+        id="reviews"
+        className="
+          relative
+          z-30
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-white
+        "
+      >
+        <h2
+          className="
+            text-5xl
+            font-bold
+          "
+        >
+          Reviews
+        </h2>
+      </section>
+
+
+      {/* ======================================
+          LOCATION
+          ====================================== */}
+
+      <section
+        id="location"
+        className="
+          relative
+          z-30
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-gray-100
+        "
+      >
+        <h2
+          className="
+            text-5xl
+            font-bold
+          "
+        >
+          Location
+        </h2>
+      </section>
+
+
+      {/* ======================================
+          FOOTER
+          ====================================== */}
+
+      <footer
+        className="
+          relative
+          z-30
+          bg-gray-900
+          py-20
+          text-center
+          text-white
+        "
+      >
+        © 2026 Your Company
       </footer>
-    </>
+
+    </main>
   );
 }
