@@ -35,7 +35,7 @@ export default function Page() {
               textShadow: "0 5px 25px rgba(0,0,0,0.8)",
             }}
           >
-            The Italian Bistro
+            The Italian Bistrro
           </h1>
 
           <p

@@ -9,10 +9,22 @@ export default function OrbPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetch('/api/orders')
-        .then(res => res.json())
-        .then(data => {
-          const readyOrders = data.filter(order => order.status === 'completed');
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+
+          const text = await res.text();
+          return text ? JSON.parse(text) : [];
+        })
+        .then((data) => {
+          const readyOrders = data.filter(
+            (order) => order.status === "completed"
+          );
           setOrders(readyOrders);
+        })
+        .catch((err) => {
+          console.error("Orders API failed:", err);
         });
     }, 2000);
 

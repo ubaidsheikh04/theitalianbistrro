@@ -1,8 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/kitchen/page": "app/kitchen/page.js",
-  "/orb/page": "app/orb/page.js",
-  "/owner/page": "app/owner/page.js",
-  "/customer/page": "app/customer/page.js",
-  "/api/orders/route": "app/api/orders/route.js"
+  "/page": "app/page.js"
 }
