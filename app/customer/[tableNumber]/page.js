@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useParams } from 'next/navigation';
 
 function MenuItem({ item, quantity, onIncrement, onDecrement }) {
   return (
@@ -28,26 +29,19 @@ function MenuItem({ item, quantity, onIncrement, onDecrement }) {
   );
 }
 
-function ConfirmationModal({ order, onConfirm, onCancel, total }) {
+function ConfirmationModal({ order, onConfirm, onCancel, total, tableNumber }) {
     const totalItems = order.reduce((acc, item) => acc + item.quantity, 0);
-    const [tableNumber, setTableNumber] = useState("");
     const [isParcel, setIsParcel] = useState(false);
 
     const handleConfirm = () => {
-        const finalTableNumber = isParcel ? "Parcel" : parseInt(tableNumber, 10);
-
-        if (!isParcel && (isNaN(finalTableNumber) || finalTableNumber < 1 || finalTableNumber > 10)) {
-            alert("Please enter a valid table number between 1 and 10.");
-            return;
-        }
-
+        const finalTableNumber = isParcel ? "Parcel" : tableNumber;
         onConfirm(order, finalTableNumber);
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-[#f8f1e7] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#333]">
-                <h2 className="text-2xl font-bold mb-4 text-center">Confirm Your Order</h2>
+                <h2 className="text-2xl font-bold mb-4 text-center">Confirm Your Order for Table {tableNumber}</h2>
                 {order.map(item => (
                     <div key={item.id} className="flex justify-between py-1">
                         <span>{item.name} x {item.quantity}</span>
@@ -61,27 +55,14 @@ function ConfirmationModal({ order, onConfirm, onCancel, total }) {
                 </div>
                 <p className="text-right text-sm italic mt-1">*Exclusive of taxes</p>
                 <div className="mt-4 flex items-center">
-                  <input 
-                    type="checkbox" 
-                    id="parcel" 
-                    checked={isParcel} 
-                    onChange={(e) => setIsParcel(e.target.checked)} 
+                  <input
+                    type="checkbox"
+                    id="parcel"
+                    checked={isParcel}
+                    onChange={(e) => setIsParcel(e.target.checked)}
                     className="h-5 w-5 mr-2"
                   />
                   <label htmlFor="parcel" className="text-lg">Parcel</label>
-                </div>
-                <div className="mt-4">
-                  <label htmlFor="tableNumber" className="block text-lg font-bold">Table Number</label>
-                  <input 
-                    type="number" 
-                    id="tableNumber" 
-                    value={tableNumber} 
-                    onChange={(e) => setTableNumber(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-md mt-1"
-                    disabled={isParcel}
-                    min="1"
-                    max="10"
-                  />
                 </div>
                 <div className="flex justify-end mt-6">
                     <button
@@ -134,6 +115,8 @@ export default function CustomerPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPostOrderModal, setShowPostOrderModal] = useState(false);
   const [confirmedOrderId, setConfirmedOrderId] = useState(null);
+  const params = useParams();
+  const tableNumber = params.tableNumber;
 
   useEffect(() => {
     fetch('/api/menu')
@@ -163,12 +146,7 @@ export default function CustomerPage() {
     });
   };
 
-  const handlePlaceOrder = (finalOrder, tableNumber) => {
-    if (!tableNumber && tableNumber !== 0) {
-      alert("Please enter a table number or select Parcel.");
-      return;
-    }
-    
+  const handlePlaceOrder = (finalOrder, finalTableNumber) => {
     const itemsForAPI = finalOrder.map(item => ({
       id: item.id,
       name: item.name,
@@ -184,7 +162,7 @@ export default function CustomerPage() {
       body: JSON.stringify({
         items: itemsForAPI,
         status: 'accepted',
-        tableNumber: tableNumber
+        tableNumber: finalTableNumber
       }),
     })
     .then(res => {
@@ -209,13 +187,13 @@ export default function CustomerPage() {
 
   return (
     <div className="p-5 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)]">
-      <h1 className="text-center mb-8 text-4xl font-bold text-[#333]">Our Menu</h1>
+      <h1 className="text-center mb-8 text-4xl font-bold text-[#333]">Our Menu for Table {tableNumber}</h1>
       
       <div className="max-w-xl mx-auto pb-40">
         {menu.map((item) => (
-          <MenuItem 
-            key={item.id} 
-            item={item} 
+          <MenuItem
+            key={item.id}
+            item={item}
             quantity={order.find(i => i.id === item.id)?.quantity || 0}
             onIncrement={handleIncrement}
             onDecrement={handleDecrement}
@@ -235,16 +213,17 @@ export default function CustomerPage() {
       )}
 
       {showConfirmation && (
-        <ConfirmationModal 
+        <ConfirmationModal
             order={order}
             total={orderTotal}
             onConfirm={handlePlaceOrder}
             onCancel={() => setShowConfirmation(false)}
+            tableNumber={tableNumber}
         />
       )}
 
       {showPostOrderModal && (
-        <PostOrderModal 
+        <PostOrderModal
             orderId={confirmedOrderId}
             onOk={() => {
                 window.location.href = 'https://search.google.com/local/writereview?placeid=ChIJew-CegCNwDsRwjr3NpyfcI8';

@@ -399,5 +399,19 @@
     ],
     "status": "served",
     "tableNumber": 2
+  },
+  {
+    "id": 26,
+    "createdAt": "2026-08-16T06:31:59.826Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Espresso",
+        "price": 2.5,
+        "quantity": 1
+      }
+    ],
+    "status": "served",
+    "tableNumber": "table7"
   }
 ]
