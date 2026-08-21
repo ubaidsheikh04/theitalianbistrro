@@ -1477,7 +1477,7 @@ export default function Page() {
           <div className="mt-12 rounded-3xl overflow-hidden border border-[#315348] h-[400px]">
 
             <iframe
-              src="YOUR_GOOGLE_MAPS_EMBED_URL"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3830.900610479134!2d74.3464247732858!3d16.225548535237802!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc08f4cf06c0cc5%3A0xc7046bbd9ddbba67!2sThe%20Italian%20Bistrro!5e0!3m2!1sen!2sin!4v1787312024355!5m2!1sen!2sin"
               className="w-full h-full border-0"
               loading="lazy"
               allowFullScreen
