@@ -1,30 +1,27 @@
-"use client";
+'use client';
 import { useState, useEffect } from "react";
 import { useParams } from 'next/navigation';
 
-function MenuItem({ item, quantity, onIncrement, onDecrement }) {
+function MenuItem({ item, onAddToCart }) {
   return (
-    <div className="border border-gray-300 p-2.5 mb-2.5 flex justify-between items-center bg-[#f8f1e7] rounded-md">
+    <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 flex items-center justify-between">
       <div>
-        <h3 className="m-0 font-[var(--font-playfair)]">{item.name}</h3>
-        <p className="m-0">₹{item.price.toFixed(2)}</p>
+        <h4 className="text-xl font-semibold">{item.name}</h4>
+        <p className="text-[#d7cdb9] mt-1">{item.description}</p>
+        <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
       </div>
-      <div className="flex items-center">
-        {quantity > 0 ? (
-          <>
-            <button onClick={() => onDecrement(item.id)} className="bg-gray-300 w-8 h-8 rounded-md text-lg font-bold">-</button>
-            <span className="px-4 text-lg">{quantity}</span>
-            <button onClick={() => onIncrement(item)} className="bg-gray-300 w-8 h-8 rounded-md text-lg font-bold">+</button>
-          </>
-        ) : (
-          <button
-            onClick={() => onIncrement(item)}
-            className="bg-[#c89d7c] text-white px-4 py-2 rounded-md hover:bg-[#b38968] transition-colors"
-          >
-            Add to Order
-          </button>
-        )}
-      </div>
+      <button onClick={() => onAddToCart(item)} className="bg-[#f4b942] text-[#102820] px-6 py-2 rounded-lg font-semibold">Add</button>
+    </div>
+  );
+}
+
+function BeverageItem({ item, onAddToCart }) {
+  return (
+    <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 text-center">
+      <img src={item.image} alt={item.name} className="h-16 mx-auto mb-4" />
+      <h4 className="text-xl font-semibold">{item.name}</h4>
+      <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
+      <button onClick={() => onAddToCart(item)} className="mt-4 bg-[#f4b942] text-[#102820] px-6 py-2 rounded-lg font-semibold">Add</button>
     </div>
   );
 }
@@ -110,7 +107,7 @@ function PostOrderModal({ onOk, onNotNow, orderId }) {
 }
 
 export default function CustomerPage() {
-  const [menu, setMenu] = useState([]);
+  const [menu, setMenu] = useState({ Pizzas: [], Burgers: [], Coffees: [], Beverages: [] });
   const [order, setOrder] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPostOrderModal, setShowPostOrderModal] = useState(false);
@@ -121,28 +118,25 @@ export default function CustomerPage() {
   useEffect(() => {
     fetch('/api/menu')
       .then(res => res.json())
-      .then(data => setMenu(data));
+      .then(data => {
+        const categorizedMenu = {
+          Pizzas: data.filter(item => item.category === 'Pizzas'),
+          Burgers: data.filter(item => item.category === 'Burgers'),
+          Coffees: data.filter(item => item.category === 'Coffees'),
+          Beverages: data.filter(item => item.category === 'Beverages'),
+        };
+        setMenu(categorizedMenu);
+      });
   }, []);
 
-  const handleIncrement = (item) => {
+  const handleAddToCart = (item) => {
     setOrder(currentOrder => {
-        const existingItem = currentOrder.find(i => i.id === item.id);
-        if (existingItem) {
-            return currentOrder.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-        } else {
-            return [...currentOrder, { ...item, quantity: 1 }];
-        }
-    });
-  };
-
-  const handleDecrement = (itemId) => {
-    setOrder(currentOrder => {
-        const itemToDecrement = currentOrder.find(i => i.id === itemId);
-        if (itemToDecrement && itemToDecrement.quantity > 1) {
-            return currentOrder.map(i => i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i);
-        } else {
-            return currentOrder.filter(i => i.id !== itemId);
-        }
+      const existingItem = currentOrder.find(i => i.id === item.id);
+      if (existingItem) {
+        return currentOrder.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+      } else {
+        return [...currentOrder, { ...item, quantity: 1 }];
+      }
     });
   };
 
@@ -186,19 +180,63 @@ export default function CustomerPage() {
   const orderTotal = order.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
-    <div className="p-5 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)]">
-      <h1 className="text-center mb-8 text-4xl font-bold text-[#333]">Our Menu for Table {tableNumber}</h1>
-      
-      <div className="max-w-xl mx-auto pb-40">
-        {menu.map((item) => (
-          <MenuItem
-            key={item.id}
-            item={item}
-            quantity={order.find(i => i.id === item.id)?.quantity || 0}
-            onIncrement={handleIncrement}
-            onDecrement={handleDecrement}
-          />
-        ))}
+    <div className="bg-[#102820] text-[#eee7d5] min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-28">
+        <div className="text-center mb-16">
+          <p className="text-[#f4b942] text-xl font-semibold">Food & Drinks</p>
+          <h2 className="text-5xl md:text-6xl font-bold mt-4 text-[#eee7d5]">Our Menu for Table {tableNumber}</h2>
+          <p className="mt-5 text-lg text-[#d7cdb9]">Simple favourites. Freshly prepared. Made to satisfy.</p>
+        </div>
+
+        <div className="space-y-12">
+          <div>
+            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
+              <span>🍕 Pizzas</span>
+              <span>▲</span>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {menu.Pizzas.map(item => (
+                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
+              <span>🍔 Burgers</span>
+              <span>▲</span>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {menu.Burgers.map(item => (
+                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
+              <span>☕ Coffees</span>
+              <span>▲</span>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {menu.Coffees.map(item => (
+                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
+              <span>🥤 Beverages</span>
+              <span>▲</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {menu.Beverages.map(item => (
+                <BeverageItem key={item.id} item={item} onAddToCart={handleAddToCart} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {order.length > 0 && (
@@ -234,6 +272,9 @@ export default function CustomerPage() {
             }}
         />
       )}
+        <footer className="text-center py-4 text-sm text-[#d7cdb9]">
+            Designed by <a href="https://wa.me/9175282915" target="_blank" rel="noopener noreferrer" className="text-[#f4b942] hover:underline">ubaidSHEIKH</a>
+        </footer>
     </div>
   );
 }

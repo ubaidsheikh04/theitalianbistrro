@@ -413,5 +413,19 @@
     ],
     "status": "served",
     "tableNumber": "table7"
+  },
+  {
+    "id": 27,
+    "createdAt": "2026-08-21T12:43:55.455Z",
+    "items": [
+      {
+        "id": 1,
+        "name": "Margherita",
+        "price": 12.99,
+        "quantity": 1
+      }
+    ],
+    "status": "served",
+    "tableNumber": "1"
   }
 ]

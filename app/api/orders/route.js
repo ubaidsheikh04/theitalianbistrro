@@ -4,28 +4,15 @@ import { promises as fs } from 'fs';
 import { withLock } from '@/utils/lock';
 
 const ordersFilePath = path.join(process.cwd(), 'orders.json');
-const menuFilePath = path.join(process.cwd(), 'menu.json');
 const tablesFilePath = path.join(process.cwd(), 'tables.json');
 
 async function readData(filePath) {
     try {
         const fileContents = await fs.readFile(filePath, 'utf8');
-
-        console.log("Reading:", filePath);
-        console.log("Contents:", JSON.stringify(fileContents));
-
-        if (!fileContents.trim()) {
-            return [];
-        }
-
+        if (!fileContents.trim()) return [];
         return JSON.parse(fileContents);
     } catch (error) {
-        console.error("Error reading", filePath, error);
-
-        if (error.code === 'ENOENT') {
-            return [];
-        }
-
+        if (error.code === 'ENOENT') return [];
         throw error;
     }
 }
@@ -34,11 +21,14 @@ async function writeData(filePath, data) {
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }
 
+async function getMenu() {
+    const menuFilePath = path.join(process.cwd(), 'menu.json');
+    return await readData(menuFilePath);
+}
+
 export async function GET() {
     try {
-        const orders = await withLock(ordersFilePath, async () => {
-            return await readData(ordersFilePath);
-        });
+        const orders = await withLock(ordersFilePath, () => readData(ordersFilePath));
         return NextResponse.json(orders);
     } catch (err) {
         console.error(err);
@@ -53,7 +43,7 @@ export async function POST(request) {
         try {
             const [orders, menu, tables] = await Promise.all([
                 readData(ordersFilePath),
-                readData(menuFilePath),
+                getMenu(),
                 readData(tablesFilePath)
             ]);
 
@@ -80,7 +70,7 @@ export async function POST(request) {
 
             orders.push(newOrder);
 
-            const table = tables.find(t => t.number === tableNumber);
+            const table = tables.find(t => t.number == tableNumber);
             if (table) {
                 table.occupied = true;
                 table.orderIds.push(newOrder.id);

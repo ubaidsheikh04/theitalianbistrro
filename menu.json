@@ -1,32 +1,18 @@
 [
-  {
-    "id": 1,
-    "name": "Espresso",
-    "price": 2.5
-  },
-  {
-    "id": 2,
-    "name": "Cappuccino",
-    "price": 3.5
-  },
-  {
-    "id": 3,
-    "name": "Latte",
-    "price": 4
-  },
-  {
-    "id": 4,
-    "name": "Tiramisu",
-    "price": 6.5
-  },
-  {
-    "id": 5,
-    "name": "Cannoli",
-    "price": 4.5
-  },
-  {
-    "id": 6,
-    "name": "Panna Cotta",
-    "price": 5.5
-  }
+  {"id":1,"name":"Margherita","description":"Margherita","price":12.99,"category":"Pizzas"},
+  {"id":2,"name":"Pepperoni","description":"Pepperoni","price":14.99,"category":"Pizzas"},
+  {"id":3,"name":"Vegetariana","description":"Vegetariana","price":13.99,"category":"Pizzas"},
+  {"id":4,"name":"Quattro Formaggi","description":"Quattro Formaggi","price":15.99,"category":"Pizzas"},
+  {"id":5,"name":"Classic Burger","description":"Classic Burger","price":9.99,"category":"Burgers"},
+  {"id":6,"name":"Cheeseburger","description":"Cheeseburger","price":10.99,"category":"Burgers"},
+  {"id":7,"name":"Bacon Burger","description":"Bacon Burger","price":11.99,"category":"Burgers"},
+  {"id":8,"name":"Veggie Burger","description":"Veggie Burger","price":9.49,"category":"Burgers"},
+  {"id":9,"name":"Espresso","description":"Espresso","price":2.50,"category":"Coffees"},
+  {"id":10,"name":"Cappuccino","description":"Cappuccino","price":3.50,"category":"Coffees"},
+  {"id":11,"name":"Latte","description":"Latte","price":4.00,"category":"Coffees"},
+  {"id":12,"name":"Americano","description":"Americano","price":3.00,"category":"Coffees"},
+  {"id":13,"name":"Coca-Cola","description":"Coca-Cola","price":2.00,"image":"/coca-cola.png","category":"Beverages"},
+  {"id":14,"name":"Sprite","description":"Sprite","price":2.00,"image":"/sprite.png","category":"Beverages"},
+  {"id":15,"name":"Orange Juice","description":"Orange Juice","price":3.00,"image":"/orange-juice.png","category":"Beverages"},
+  {"id":16,"name":"Iced Tea","description":"Iced Tea","price":2.50,"image":"/iced-tea.png","category":"Beverages"}
 ]
