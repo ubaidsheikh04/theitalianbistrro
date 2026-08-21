@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 
 // ============================================================
@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react';
 
 const Header = () => {
   const headerRef = useRef(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const scrollTo = (id) => {
     const element = document.getElementById(id);
@@ -18,6 +19,15 @@ const Header = () => {
         behavior: 'smooth',
       });
     }
+  };
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const closeDrawerAndScroll = (id) => {
+    setIsDrawerOpen(false);
+    scrollTo(id);
   };
 
   return (
@@ -118,15 +128,87 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center">
-
-          <button
-            onClick={() => scrollTo('menu')}
-            className="text-sm font-semibold border border-white/50 px-4 py-2 rounded-full"
-          >
-            Menu
+          <button onClick={toggleDrawer} className="focus:outline-none">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
           </button>
-
         </div>
+
+        {/* Drawer */}
+        {isDrawerOpen && (
+          <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
+            <div className="fixed top-0 right-0 h-full w-64 bg-[#0b1f18] shadow-lg z-50 p-6">
+              <button onClick={toggleDrawer} className="absolute top-4 right-4 text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <ul className="mt-12 space-y-4">
+                <li>
+                  <a
+                    href="#about"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeDrawerAndScroll('about');
+                    }}
+                    className="text-lg font-semibold text-white hover:opacity-70 transition-opacity"
+                  >
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#what-we-serve"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeDrawerAndScroll('what-we-serve');
+                    }}
+                    className="text-lg font-semibold text-white hover:opacity-70 transition-opacity"
+                  >
+                    What We Serve
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#menu"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeDrawerAndScroll('menu');
+                    }}
+                    className="text-lg font-semibold text-white hover:opacity-70 transition-opacity"
+                  >
+                    Menu
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#reviews"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeDrawerAndScroll('reviews');
+                    }}
+                    className="text-lg font-semibold text-white hover:opacity-70 transition-opacity"
+                  >
+                    Reviews
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#location"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeDrawerAndScroll('location');
+                    }}
+                    className="text-lg font-semibold text-white hover:opacity-70 transition-opacity"
+                  >
+                    Location
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
 
       </nav>
     </header>
