@@ -2,26 +2,22 @@
 import { useState, useEffect } from "react";
 import { useParams } from 'next/navigation';
 
-function MenuItem({ item, onAddToCart }) {
+function MenuItem({ item, onUpdateQuantity, quantity }) {
   return (
     <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 flex items-center justify-between">
-      <div>
-        <h4 className="text-xl font-semibold">{item.name}</h4>
-        <p className="text-[#d7cdb9] mt-1">{item.description}</p>
-        <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
+      <div className="flex items-center">
+        <img src={item.image || '/placeholder.png'} alt={item.name} className="h-16 w-16 object-cover rounded-md mr-4" />
+        <div>
+          <h4 className="text-xl font-semibold">{item.name}</h4>
+          {item.description && <p className="text-[#d7cdb9] mt-1">{item.description}</p>}
+          <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
+        </div>
       </div>
-      <button onClick={() => onAddToCart(item)} className="bg-[#f4b942] text-[#102820] px-6 py-2 rounded-lg font-semibold">Add</button>
-    </div>
-  );
-}
-
-function BeverageItem({ item, onAddToCart }) {
-  return (
-    <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 text-center">
-      <img src={item.image} alt={item.name} className="h-16 mx-auto mb-4" />
-      <h4 className="text-xl font-semibold">{item.name}</h4>
-      <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
-      <button onClick={() => onAddToCart(item)} className="mt-4 bg-[#f4b942] text-[#102820] px-6 py-2 rounded-lg font-semibold">Add</button>
+      <div className="flex items-center">
+        <button onClick={() => onUpdateQuantity(item, (quantity || 0) - 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">-</button>
+        <span className="px-4 text-lg font-semibold">{quantity || 0}</span>
+        <button onClick={() => onUpdateQuantity(item, (quantity || 0) + 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">+</button>
+      </div>
     </div>
   );
 }
@@ -107,33 +103,47 @@ function PostOrderModal({ onOk, onNotNow, orderId }) {
 }
 
 export default function CustomerPage() {
-  const [menu, setMenu] = useState({ Pizzas: [], Burgers: [], Coffees: [], Beverages: [] });
+  const [menu, setMenu] = useState({});
   const [order, setOrder] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPostOrderModal, setShowPostOrderModal] = useState(false);
   const [confirmedOrderId, setConfirmedOrderId] = useState(null);
   const params = useParams();
   const tableNumber = params.tableNumber;
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     fetch('/api/menu')
       .then(res => res.json())
       .then(data => {
-        const categorizedMenu = {
-          Pizzas: data.filter(item => item.category === 'Pizzas'),
-          Burgers: data.filter(item => item.category === 'Burgers'),
-          Coffees: data.filter(item => item.category === 'Coffees'),
-          Beverages: data.filter(item => item.category === 'Beverages'),
-        };
+        const categorizedMenu = data.reduce((acc, item) => {
+          if (!acc[item.category]) {
+            acc[item.category] = [];
+          }
+          acc[item.category].push(item);
+          return acc;
+        }, {});
         setMenu(categorizedMenu);
+        const initialExpandedState = Object.keys(categorizedMenu).reduce((acc, category) => {
+            acc[category] = true;
+            return acc;
+        }, {});
+        setExpanded(initialExpandedState);
       });
   }, []);
 
-  const handleAddToCart = (item) => {
+  const toggleCategory = (category) => {
+    setExpanded(prev => ({ ...prev, [category]: !prev[category] }));
+  };
+
+  const handleUpdateQuantity = (item, quantity) => {
     setOrder(currentOrder => {
       const existingItem = currentOrder.find(i => i.id === item.id);
+      if (quantity <= 0) {
+        return currentOrder.filter(i => i.id !== item.id);
+      }
       if (existingItem) {
-        return currentOrder.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return currentOrder.map(i => i.id === item.id ? { ...i, quantity } : i);
       } else {
         return [...currentOrder, { ...item, quantity: 1 }];
       }
@@ -177,65 +187,47 @@ export default function CustomerPage() {
     });
   };
 
+  const getQuantity = (itemId) => {
+    const item = order.find(i => i.id === itemId);
+    return item ? item.quantity : 0;
+  };
+
   const orderTotal = order.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
     <div className="bg-[#102820] text-[#eee7d5] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-28">
         <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">Welcome to The Italian Bistro</h1>
           <p className="text-[#f4b942] text-xl font-semibold">Food & Drinks</p>
           <h2 className="text-5xl md:text-6xl font-bold mt-4 text-[#eee7d5]">Our Menu for Table {tableNumber}</h2>
           <p className="mt-5 text-lg text-[#d7cdb9]">Simple favourites. Freshly prepared. Made to satisfy.</p>
         </div>
 
         <div className="space-y-12">
-          <div>
-            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
-              <span>🍕 Pizzas</span>
-              <span>▲</span>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {menu.Pizzas.map(item => (
-                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
-              ))}
+          {Object.keys(menu).map(category => (
+            <div key={category}>
+              <h3 
+                className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between cursor-pointer"
+                onClick={() => toggleCategory(category)}
+              >
+                <span>{category}</span>
+                <span>{expanded[category] ? '▼' : '▲'}</span>
+              </h3>
+              {expanded[category] && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {menu[category].map(item => (
+                    <MenuItem 
+                      key={item.id} 
+                      item={item} 
+                      onUpdateQuantity={handleUpdateQuantity} 
+                      quantity={getQuantity(item.id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-
-          <div>
-            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
-              <span>🍔 Burgers</span>
-              <span>▲</span>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {menu.Burgers.map(item => (
-                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
-              <span>☕ Coffees</span>
-              <span>▲</span>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {menu.Coffees.map(item => (
-                <MenuItem key={item.id} item={item} onAddToCart={handleAddToCart} />
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-3xl font-bold text-[#f4b942] mb-6 flex items-center justify-between">
-              <span>🥤 Beverages</span>
-              <span>▲</span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {menu.Beverages.map(item => (
-                <BeverageItem key={item.id} item={item} onAddToCart={handleAddToCart} />
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 

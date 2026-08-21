@@ -1,18 +1,315 @@
+
 [
-  {"id":1,"name":"Margherita","description":"Margherita","price":12.99,"category":"Pizzas"},
-  {"id":2,"name":"Pepperoni","description":"Pepperoni","price":14.99,"category":"Pizzas"},
-  {"id":3,"name":"Vegetariana","description":"Vegetariana","price":13.99,"category":"Pizzas"},
-  {"id":4,"name":"Quattro Formaggi","description":"Quattro Formaggi","price":15.99,"category":"Pizzas"},
-  {"id":5,"name":"Classic Burger","description":"Classic Burger","price":9.99,"category":"Burgers"},
-  {"id":6,"name":"Cheeseburger","description":"Cheeseburger","price":10.99,"category":"Burgers"},
-  {"id":7,"name":"Bacon Burger","description":"Bacon Burger","price":11.99,"category":"Burgers"},
-  {"id":8,"name":"Veggie Burger","description":"Veggie Burger","price":9.49,"category":"Burgers"},
-  {"id":9,"name":"Espresso","description":"Espresso","price":2.50,"category":"Coffees"},
-  {"id":10,"name":"Cappuccino","description":"Cappuccino","price":3.50,"category":"Coffees"},
-  {"id":11,"name":"Latte","description":"Latte","price":4.00,"category":"Coffees"},
-  {"id":12,"name":"Americano","description":"Americano","price":3.00,"category":"Coffees"},
-  {"id":13,"name":"Coca-Cola","description":"Coca-Cola","price":2.00,"image":"/coca-cola.png","category":"Beverages"},
-  {"id":14,"name":"Sprite","description":"Sprite","price":2.00,"image":"/sprite.png","category":"Beverages"},
-  {"id":15,"name":"Orange Juice","description":"Orange Juice","price":3.00,"image":"/orange-juice.png","category":"Beverages"},
-  {"id":16,"name":"Iced Tea","description":"Iced Tea","price":2.50,"image":"/iced-tea.png","category":"Beverages"}
+  {
+    "id": 1,
+    "name": "Pesto",
+    "price": 220,
+    "category": "Pasta",
+    "description": "Penne / Spaghetti",
+    "image": "/pasta.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Alfredo",
+    "price": 200,
+    "category": "Pasta",
+    "description": "Penne / Spaghetti",
+    "image": "/pasta.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Rosa",
+    "price": 200,
+    "category": "Pasta",
+    "description": "Penne / Spaghetti",
+    "image": "/pasta.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Espresso",
+    "price": 40,
+    "category": "Hot Coffee",
+    "description": "plain coffee powder & water",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Americano",
+    "price": 45,
+    "category": "Hot Coffee",
+    "description": "Espresso + water",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Cappuccino",
+    "price": 50,
+    "category": "Hot Coffee",
+    "description": "Espresso + milk + foam + sugar",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Latte",
+    "price": 80,
+    "category": "Hot Coffee",
+    "description": "",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 8,
+    "name": "Hot Chocolate",
+    "price": 70,
+    "category": "Hot Coffee",
+    "description": "",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 9,
+    "name": "Classic Cold Coffee",
+    "price": 70,
+    "category": "Cold Coffee",
+    "description": "",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 10,
+    "name": "Chocolate Cold Coffee",
+    "price": 80,
+    "category": "Cold Coffee",
+    "description": "",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 11,
+    "name": "Bistro Signature Mocha",
+    "price": 80,
+    "category": "Cold Coffee",
+    "description": "",
+    "image": "/coffee.jpg"
+  },
+  {
+    "id": 12,
+    "name": "Italian Herb Maggi",
+    "price": 60,
+    "category": "Maggi",
+    "description": "Add on cheese",
+    "image": "/maggi.jpg"
+  },
+  {
+    "id": 13,
+    "name": "Classic French Fries",
+    "price": 70,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/fries.jpg"
+  },
+  {
+    "id": 14,
+    "name": "Peri-Peri Fries",
+    "price": 90,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/fries.jpg"
+  },
+  {
+    "id": 15,
+    "name": "Cheese Loaded Fries",
+    "price": 150,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/fries.jpg"
+  },
+  {
+    "id": 16,
+    "name": "Jalapeno Cheese Croquettes",
+    "price": 130,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/nuggets.jpg"
+  },
+  {
+    "id": 17,
+    "name": "Cheese Balls",
+    "price": 99,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/nuggets.jpg"
+  },
+  {
+    "id": 18,
+    "name": "Bistro Bucket",
+    "price": 170,
+    "category": "Fries / Nuggets",
+    "description": "",
+    "image": "/nuggets.jpg"
+  },
+  {
+    "id": 19,
+    "name": "Virgin Mojito",
+    "price": 80,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 20,
+    "name": "Mint Mojito",
+    "price": 90,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 21,
+    "name": "Berry Cooler",
+    "price": 100,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 22,
+    "name": "Cranberry",
+    "price": 100,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 23,
+    "name": "Guava Mint Fizz",
+    "price": 100,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 24,
+    "name": "Musk-Melon",
+    "price": 100,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 25,
+    "name": "Green Apple",
+    "price": 100,
+    "category": "Mojitos",
+    "description": "",
+    "image": "/mojito.jpg"
+  },
+  {
+    "id": 26,
+    "name": "Classic Garlic Toasts",
+    "price": 100,
+    "category": "Italian Toasts",
+    "description": "",
+    "image": "/toast.jpg"
+  },
+  {
+    "id": 27,
+    "name": "Italian Chilli-Garlic Cheese Toast",
+    "price": 130,
+    "category": "Italian Toasts",
+    "description": "",
+    "image": "/toast.jpg"
+  },
+  {
+    "id": 28,
+    "name": "Bistro Prime Chilli-Garlic Toast",
+    "price": 199,
+    "category": "Italian Toasts",
+    "description": "",
+    "image": "/toast.jpg"
+  },
+  {
+    "id": 29,
+    "name": "Classic Cola",
+    "price": 30,
+    "category": "Chill Zone",
+    "description": "",
+    "image": "/beverages.jpg"
+  },
+  {
+    "id": 30,
+    "name": "Lemon Fizz",
+    "price": 30,
+    "category": "Chill Zone",
+    "description": "",
+    "image": "/beverages.jpg"
+  },
+  {
+    "id": 31,
+    "name": "Mango Delight",
+    "price": 30,
+    "category": "Chill Zone",
+    "description": "",
+    "image": "/beverages.jpg"
+  },
+  {
+    "id": 32,
+    "name": "Orange Spark",
+    "price": 30,
+    "category": "Chill Zone",
+    "description": "",
+    "image": "/beverages.jpg"
+  },
+  {
+    "id": 33,
+    "name": "Pesto Panini",
+    "price": 150,
+    "category": "Sandwiches / Panini",
+    "description": "Panini",
+    "image": "/panini.jpg"
+  },
+  {
+    "id": 34,
+    "name": "Spicy Paneer Panini",
+    "price": 150,
+    "category": "Sandwiches / Panini",
+    "description": "Panini",
+    "image": "/panini.jpg"
+  },
+  {
+    "id": 35,
+    "name": "Peri-Peri Panini",
+    "price": 150,
+    "category": "Sandwiches / Panini",
+    "description": "Panini",
+    "image": "/panini.jpg"
+  },
+  {
+    "id": 36,
+    "name": "Farm House Jumbo Panini",
+    "price": 150,
+    "category": "Sandwiches / Panini",
+    "description": "Panini",
+    "image": "/panini.jpg"
+  },
+  {
+    "id": 37,
+    "name": "Classic Grill Sandwich",
+    "price": 80,
+    "category": "Sandwiches / Panini",
+    "description": "Sandwich",
+    "image": "/sandwich.jpg"
+  },
+  {
+    "id": 38,
+    "name": "Veg Club Sandwich",
+    "price": 140,
+    "category": "Sandwiches / Panini",
+    "description": "Sandwich",
+    "image": "/sandwich.jpg"
+  },
+  {
+    "id": 39,
+    "name": "Bistro Cheese Loaded Sandwich",
+    "price": 180,
+    "category": "Sandwiches / Panini",
+    "description": "Sandwich",
+    "image": "/sandwich.jpg"
+  }
 ]
