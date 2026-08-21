@@ -125,7 +125,7 @@ export default function CustomerPage() {
         }, {});
         setMenu(categorizedMenu);
         const initialExpandedState = Object.keys(categorizedMenu).reduce((acc, category) => {
-            acc[category] = true;
+            acc[category] = false;
             return acc;
         }, {});
         setExpanded(initialExpandedState);
@@ -196,12 +196,15 @@ export default function CustomerPage() {
 
   return (
     <div className="bg-[#102820] text-[#eee7d5] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-28">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pt-12 pb-40">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">Welcome to The Italian Bistro</h1>
+          <div className="mb-8">
+            <p className="text-2xl md:text-3xl text-[#eee7d5]">Welcome to</p>
+            <h1 className="text-5xl md:text-6xl font-bold text-white">The Italian Bistrro</h1>
+          </div>
           <p className="text-[#f4b942] text-xl font-semibold">Food & Drinks</p>
           <h2 className="text-5xl md:text-6xl font-bold mt-4 text-[#eee7d5]">Our Menu for Table {tableNumber}</h2>
-          <p className="mt-5 text-lg text-[#d7cdb9]">Simple favourites. Freshly prepared. Made to satisfy.</p>
+          <p className="mt-5 text-lg text-[#d7cdb9]">Authentic Italian Flavours</p>
         </div>
 
         <div className="space-y-12">
@@ -232,7 +235,7 @@ export default function CustomerPage() {
       </div>
 
       {order.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-[#333] text-white p-5 text-center">
+        <div className="fixed bottom-8 left-0 right-0 bg-[#333] text-white p-5 text-center z-10">
           <button
             onClick={() => setShowConfirmation(true)}
             className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors mt-4"
@@ -264,9 +267,9 @@ export default function CustomerPage() {
             }}
         />
       )}
-        <footer className="text-center py-4 text-sm text-[#d7cdb9]">
-            Designed by <a href="https://wa.me/9175282915" target="_blank" rel="noopener noreferrer" className="text-[#f4b942] hover:underline">ubaidSHEIKH</a>
-        </footer>
+      <footer className="fixed bottom-0 left-0 right-0 bg-[#102820] text-center py-2 text-sm text-[#d7cdb9] z-10">
+        Designed by <a href="https://wa.me/9175282915" target="_blank" rel="noopener noreferrer" className="text-[#f4b942] hover:underline">ubaidSHEIKH</a>
+      </footer>
     </div>
   );
 }
