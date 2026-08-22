@@ -11,9 +11,11 @@
   {
     "id": 2,
     "number": 2,
-    "occupied": false,
-    "orderIds": [],
-    "totalBill": 0
+    "occupied": true,
+    "orderIds": [
+      29
+    ],
+    "totalBill": 140
   },
   {
     "id": 3,

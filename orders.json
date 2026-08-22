@@ -441,5 +441,19 @@
     ],
     "status": "accepted",
     "tableNumber": "1"
+  },
+  {
+    "id": 29,
+    "createdAt": "2026-08-22T04:10:07.753Z",
+    "items": [
+      {
+        "id": 13,
+        "name": "Classic French Fries",
+        "price": 70,
+        "quantity": 2
+      }
+    ],
+    "status": "accepted",
+    "tableNumber": "2"
   }
 ]
