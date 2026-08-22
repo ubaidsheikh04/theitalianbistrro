@@ -1,26 +1,22 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
 import { promises as fs } from 'fs';
-import { withLock } from '@/utils/lock';
 
-const tablesFilePath = path.join(process.cwd(), 'tables.json');
+const jsonDirectory = path.join(process.cwd());
 
 async function readTables() {
     try {
-        const fileContents = await fs.readFile(tablesFilePath, 'utf8');
-        if (!fileContents) {
-            return [];
-        }
+        const fileContents = await fs.readFile(path.join(jsonDirectory, 'tables.json'), 'utf8');
         return JSON.parse(fileContents);
     } catch (error) {
-        if (error.code === 'ENOENT') return [];
+        if (error.code === 'ENOENT') {
+            return [];
+        }
         throw error;
     }
 }
 
 export async function GET() {
-  return await withLock(tablesFilePath, async () => {
     const tables = await readTables();
     return NextResponse.json(tables);
-  });
 }
