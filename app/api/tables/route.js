@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
+import { db } from '@/database';
 
-const jsonDirectory = path.join(process.cwd());
-
-async function readTables() {
-    try {
-        const fileContents = await fs.readFile(path.join(jsonDirectory, 'tables.json'), 'utf8');
-        return JSON.parse(fileContents);
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return [];
-        }
-        throw error;
-    }
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-    const tables = await readTables();
+    const tablesCollection = db.collection('tables');
+    const snapshot = await tablesCollection.get();
+    if (snapshot.empty) {
+        return NextResponse.json([]);
+    }
+    const tables = [];
+    snapshot.forEach(doc => {
+        tables.push({ id: doc.id, ...doc.data() });
+    });
     return NextResponse.json(tables);
 }

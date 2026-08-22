@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 function Order({ order, markAsPreparing, markAsCompleted, markAsServed }) {
   return (
     <div className={`border border-gray-300 p-5 mb-5 rounded-md ${order.status === 'preparing' ? 'bg-yellow-100' : (order.status === 'completed' ? 'bg-green-100' : 'bg-[#f8f1e7]')}`}>
-      <h3 className="font-[var(--font-playfair)] text-2xl font-bold">Order #{order.id}</h3>
+      <h3 className="font-[var(--font-playfair)] text-2xl font-bold">Order #{order.orderNumber}</h3>
       <p className="text-lg">Table: {order.tableNumber || 'Parcel'}</p>
       <p className="text-lg">Status: <span className="font-bold">{order.status}</span></p>
       <ul className="list-disc list-inside mt-2">

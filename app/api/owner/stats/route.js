@@ -1,17 +1,23 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
+import { db } from '@/database'; // Correctly import the database instance
 import { getWeekNumber } from '@/utils/date';
 
-const ordersFilePath = path.join(process.cwd(), 'orders.json');
-
+// Fetches all orders from the Firestore 'orders' collection
 async function readOrders() {
     try {
-        const fileContents = await fs.readFile(ordersFilePath, 'utf8');
-        return JSON.parse(fileContents);
+        const ordersCollection = db.collection('orders');
+        const snapshot = await ordersCollection.get();
+        if (snapshot.empty) {
+            return [];
+        }
+        const orders = [];
+        snapshot.forEach(doc => {
+            orders.push({ id: doc.id, ...doc.data() });
+        });
+        return orders;
     } catch (error) {
-        if (error.code === 'ENOENT') return [];
-        throw error;
+        console.error("Error fetching orders from Firestore:", error);
+        return []; // Return an empty array on error
     }
 }
 
@@ -53,7 +59,7 @@ export async function GET() {
         monthlySales: Object.entries(monthlySales).map(([month, sales]) => ({ month, sales })),
         totalRevenue: totalRevenue || 0,
         totalOrders: orders.length,
-        orders, // Pass all orders for detailed view
+        orders, // Pass all orders with `orderNumber`
     };
 
     return NextResponse.json(stats);

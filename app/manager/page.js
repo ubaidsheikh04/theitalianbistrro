@@ -12,13 +12,13 @@ export default function ManagerPage() {
 
   const fetchData = () => {
     fetch('/api/orders').then(res => res.json()).then(setOrders).catch(err => console.error("Error fetching orders:", err));
-    fetch('/api/tables').then(res => res.json()).then(setTables).catch(err => console.error("Error fetching tables:", err));
+    fetch('/api/tables').then(res => res.json()).then(data => setTables(data.sort((a, b) => a.id - b.id))).catch(err => console.error("Error fetching tables:", err));
     fetch('/api/menu').then(res => res.json()).then(setMenu).catch(err => console.error("Error fetching menu:", err));
   };
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 2000);
+    const interval = setInterval(fetchData, 2000); // Poll for updates every 2 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -29,8 +29,11 @@ export default function ManagerPage() {
       body: JSON.stringify({ tableId }),
     })
     .then(res => {
-      if (res.ok) fetchData();
-      else console.error("Failed to mark table as paid");
+      if (res.ok) {
+        fetchData(); // Re-fetch data to update the UI
+      } else {
+        console.error("Failed to mark table as paid");
+      }
     })
     .catch(err => console.error("Error marking table as paid:", err));
   };
@@ -42,7 +45,9 @@ export default function ManagerPage() {
       body: JSON.stringify({ id: itemId }),
     })
     .then(res => {
-      if (res.ok) setMenu(prevMenu => prevMenu.filter(item => item.id !== itemId));
+      if (res.ok) {
+        setMenu(prevMenu => prevMenu.filter(item => item.id !== itemId));
+      }
     })
     .catch(err => console.error("Error deleting menu item:", err));
   };
@@ -74,7 +79,7 @@ export default function ManagerPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tables.map(table => (
             <div key={table.id} className={`p-4 rounded-lg shadow-md ${table.occupied ? 'bg-red-100 border-red-400' : 'bg-green-100 border-green-400'} border-2`}>
-              <h3 className="text-xl font-bold mb-2">Table {table.number} - {table.occupied ? 'Occupied' : 'Available'}</h3>
+              <h3 className="text-xl font-bold mb-2">Table {table.id} - {table.occupied ? 'Occupied' : 'Available'}</h3>
               {table.occupied && (
                 <div>
                   <p className="font-bold text-lg">Total Bill: ₹{table.totalBill.toFixed(2)}</p>
@@ -85,7 +90,7 @@ export default function ManagerPage() {
                         const order = orders.find(o => o.id === orderId);
                         return order ? (
                           <li key={order.id} className="mt-1">
-                            Order #{order.id} ({order.status})
+                            Order #{order.orderNumber} ({order.status})
                             <ul className="list-disc pl-5">
                               {order.items.map(item => (
                                 <li key={item.id}>{item.name} (x{item.quantity}) - ₹{(item.price * item.quantity).toFixed(2)}</li>

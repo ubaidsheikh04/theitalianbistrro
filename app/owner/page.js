@@ -124,7 +124,7 @@ export default function OwnerPage() {
                 <table className="w-full text-left">
                     <thead>
                         <tr className="border-b">
-                            <th className="py-2">Order ID</th>
+                            <th className="py-2">Order Number</th>
                             <th className="py-2">Items</th>
                             <th className="py-2 text-right">Total (₹)</th>
                         </tr>
@@ -132,7 +132,7 @@ export default function OwnerPage() {
                     <tbody>
                         {filteredOrders.map(order => (
                             <tr key={order.id} className="border-b">
-                                <td className="py-2">{order.id}</td>
+                                <td className="py-2">{order.orderNumber || order.id}</td>
                                 <td className="py-2">
                                     <ul className="list-disc pl-5">
                                         {order.items.map(item => (

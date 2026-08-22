@@ -1,5 +1,5 @@
-.next/
-node_modules/
-.env
 .env.local
-firebase-debug.log
+serviceAccountKey.json
+node_modules/
+.next/
+.firebase/

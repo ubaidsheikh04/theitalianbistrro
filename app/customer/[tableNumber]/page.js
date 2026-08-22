@@ -171,7 +171,9 @@ export default function CustomerPage() {
     })
     .then(res => {
       if (!res.ok) {
-        throw new Error('Network response was not ok');
+        return res.json().then(errorData => {
+          throw new Error(errorData.message || 'Failed to place order. Please try again.');
+        });
       }
       return res.json();
     })
@@ -183,7 +185,7 @@ export default function CustomerPage() {
     })
     .catch(error => {
         console.error('Error placing order:', error);
-        alert('Failed to place order. Please try again.');
+        alert(error.message);
     });
   };
 

@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
+import { db } from '@/database';
 
-const jsonDirectory = path.join(process.cwd());
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-    const fileContents = await fs.readFile(path.join(jsonDirectory, 'menu.json'), 'utf8');
-    const menu = JSON.parse(fileContents);
+    const menuCollection = db.collection('menu');
+    const snapshot = await menuCollection.get();
+    if (snapshot.empty) {
+        return NextResponse.json([]);
+    }
+    const menu = [];
+    snapshot.forEach(doc => {
+        menu.push({ id: doc.id, ...doc.data() });
+    });
     return NextResponse.json(menu);
 }

@@ -85,7 +85,7 @@ export default function OrbPage() {
             borderRadius: "10px",
             textAlign: "center"
           }}>
-            <h2 style={{ fontSize: "2rem" }}>Order #{order.id} is Ready</h2>
+            <h2 style={{ fontSize: "2rem" }}>Order #{order.orderNumber} is Ready</h2>
           </div>
         ))}
       </div>
