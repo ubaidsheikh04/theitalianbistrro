@@ -8,7 +8,10 @@ export default function ManagerPage() {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState('');
+  const [newItemImage, setNewItemImage] = useState('');
   const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
 
   const fetchData = () => {
     fetch('/api/orders').then(res => res.json()).then(setOrders).catch(err => console.error("Error fetching orders:", err));
@@ -18,7 +21,7 @@ export default function ManagerPage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 2000); // Poll for updates every 2 seconds
+    const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -30,26 +33,25 @@ export default function ManagerPage() {
     })
     .then(res => {
       if (res.ok) {
-        fetchData(); // Re-fetch data to update the UI
-      } else {
-        console.error("Failed to mark table as paid");
+        fetchData();
       }
     })
     .catch(err => console.error("Error marking table as paid:", err));
   };
 
-  const handleDeleteMenuItem = async (itemId) => {
-    fetch('/api/menu', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: itemId }),
-    })
-    .then(res => {
-      if (res.ok) {
-        setMenu(prevMenu => prevMenu.filter(item => item.id !== itemId));
-      }
-    })
-    .catch(err => console.error("Error deleting menu item:", err));
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (editingItem) {
+          setEditingItem({ ...editingItem, image: reader.result });
+        } else {
+          setNewItemImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddMenuItem = async (e) => {
@@ -57,17 +59,35 @@ export default function ManagerPage() {
     fetch('/api/menu', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newItemName, price: newItemPrice }),
+      body: JSON.stringify({ name: newItemName, price: newItemPrice, category: newItemCategory, image: newItemImage }),
     })
     .then(res => {
       if (res.ok) {
         setNewItemName('');
         setNewItemPrice('');
+        setNewItemCategory('');
+        setNewItemImage('');
         setShowAddItemForm(false);
         fetchData();
       }
     })
     .catch(err => console.error("Error adding menu item:", err));
+  };
+
+  const handleUpdateMenuItem = async (e) => {
+    e.preventDefault();
+    fetch('/api/menu', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingItem),
+    })
+    .then(res => {
+        if (res.ok) {
+            setEditingItem(null);
+            fetchData();
+        }
+    })
+    .catch(err => console.error("Error updating menu item:", err));
   };
 
   return (
@@ -83,24 +103,6 @@ export default function ManagerPage() {
               {table.occupied && (
                 <div>
                   <p className="font-bold text-lg">Total Bill: ₹{table.totalBill.toFixed(2)}</p>
-                  <div className="mt-2">
-                    <h4 className="font-semibold">Orders:</h4>
-                    <ul className="list-disc pl-5 text-sm">
-                      {table.orderIds.map(orderId => {
-                        const order = orders.find(o => o.id === orderId);
-                        return order ? (
-                          <li key={order.id} className="mt-1">
-                            Order #{order.orderNumber} ({order.status})
-                            <ul className="list-disc pl-5">
-                              {order.items.map(item => (
-                                <li key={item.id}>{item.name} (x{item.quantity}) - ₹{(item.price * item.quantity).toFixed(2)}</li>
-                              ))}
-                            </ul>
-                          </li>
-                        ) : null;
-                      })}
-                    </ul>
-                  </div>
                   <button onClick={() => handlePaid(table.id)} className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Mark as Paid</button>
                 </div>
               )}
@@ -122,22 +124,40 @@ export default function ManagerPage() {
               </button>
               {showAddItemForm && (
                 <form onSubmit={handleAddMenuItem} className="mt-4 p-4 bg-white rounded-lg shadow-md">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} placeholder="Item Name" className="flex-grow p-2 border rounded-md" required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} placeholder="Item Name" className="p-2 border rounded-md" required />
                     <input type="number" value={newItemPrice} onChange={(e) => setNewItemPrice(e.target.value)} placeholder="Price" className="p-2 border rounded-md" required step="0.01" />
-                    <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Add Item</button>
+                    <input type="text" value={newItemCategory} onChange={(e) => setNewItemCategory(e.target.value)} placeholder="Category" className="p-2 border rounded-md" required />
+                    <input type="file" onChange={handleImageChange} className="p-2 border rounded-md" />
                   </div>
+                  <button type="submit" className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Add Item</button>
                 </form>
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4">
               {menu.map(item => (
-                <div key={item.id} className="bg-[#f8f1e7] p-4 rounded-lg shadow-md flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-bold">{item.name}</h3>
-                    <p>₹{item.price.toFixed(2)}</p>
-                  </div>
-                  <button onClick={() => handleDeleteMenuItem(item.id)} className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors text-sm">Delete</button>
+                <div key={item.id} className="bg-[#f8f1e7] p-4 rounded-lg shadow-md">
+                  {editingItem && editingItem.id === item.id ? (
+                    <form onSubmit={handleUpdateMenuItem}>
+                        <img src={editingItem.image} alt={editingItem.name} className="w-full h-32 object-cover mb-4 rounded-md" />
+                        <input type="text" value={editingItem.name} onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })} placeholder="Item Name" className="w-full p-2 border rounded-md mb-2" required />
+                        <input type="number" value={editingItem.price} onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })} placeholder="Price" className="w-full p-2 border rounded-md mb-2" required step="0.01" />
+                        <input type="text" value={editingItem.category} onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })} placeholder="Category" className="w-full p-2 border rounded-md mb-2" required />
+                        <input type="file" onChange={handleImageChange} className="w-full p-2 border rounded-md mb-4" />
+                        <div className="flex justify-end gap-2">
+                            <button type="button" onClick={() => setEditingItem(null)} className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Cancel</button>
+                            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Save</button>
+                        </div>
+                    </form>
+                  ) : (
+                    <div>
+                        {item.image && <img src={item.image} alt={item.name} className="w-full h-32 object-cover mb-4 rounded-md" />}
+                        <h3 className="text-lg font-bold">{item.name}</h3>
+                        <p>₹{item.price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <button onClick={() => setEditingItem(item)} className="mt-4 w-full bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors">Edit</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
