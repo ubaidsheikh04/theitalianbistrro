@@ -9,8 +9,10 @@ async function getMenu() {
     }
     const menu = [];
     snapshot.forEach(doc => {
-        const data = doc.data();
-        menu.push(data);
+        menu.push({
+            ...doc.data(),
+            id: doc.id,
+        });
     });
     return menu;
 }
