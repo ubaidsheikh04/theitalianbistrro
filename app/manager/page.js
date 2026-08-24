@@ -174,6 +174,23 @@ export default function ManagerPage() {
               {table.occupied && (
                 <div>
                   <p className="font-bold text-lg">Total Bill: ₹{(table.totalBill || 0).toFixed(2)}</p>
+                  <div className="mt-2">
+                    <h4 className="font-bold">Current Orders:</h4>
+                    {orders
+                      .filter(order => table.orderIds && table.orderIds.includes(order.id))
+                      .map(order => (
+                        <div key={order.id} className="mt-2 pl-4 border-l-2 border-gray-400">
+                          <p className="font-semibold">Order #{order.orderNumber} - <span className="font-normal">{order.status}</span></p>
+                          <ul className="list-disc list-inside text-sm">
+                            {order.items.map((item, index) => (
+                              <li key={index}>
+                                {item.name} x {item.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                  </div>
                   <button onClick={() => handlePaid(table.id)} className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Mark as Paid</button>
                 </div>
               )}
