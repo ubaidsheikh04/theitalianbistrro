@@ -27,9 +27,11 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^5"
   },
-  "onlyBuiltDependencies": [
-    "@firebase/util",
-    "protobufjs",
-    "unrs-resolver"
-  ]
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@firebase/util",
+      "protobufjs",
+      "unrs-resolver"
+    ]
+  }
 }
