@@ -1180,272 +1180,77 @@ export default function Page() {
           MENU
           ===================================================== */}
 
-      <section
-        id="menu"
-        className="relative z-20 bg-[#102820] px-6 md:px-12 lg:px-20 py-28"
-      >
-
+      <section id="menu" className="relative z-20 bg-[#102820] px-6 md:px-12 lg:px-20 py-28">
         <div className="max-w-7xl mx-auto">
-
           <div className="text-center mb-16">
-
-            <p className="text-[#f4b942] text-xl font-semibold">
-              Food & Drinks
-            </p>
-
-            <h2 className="text-5xl md:text-6xl font-bold mt-4 text-[#eee7d5]">
-              Our Menu
-            </h2>
-
-            <p className="mt-5 text-lg text-[#d7cdb9]">
-              Simple favourites. Freshly prepared. Made to satisfy.
-            </p>
-
+            <p className="text-[#f4b942] text-xl font-semibold">Food & Drinks</p>
+            <h2 className="text-5xl md:text-6xl font-bold mt-4 text-[#eee7d5]">Our Menu</h2>
+            <p className="mt-5 text-lg text-[#d7cdb9]">Simple favourites. Freshly prepared. Made to satisfy.</p>
           </div>
-
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-
-            {/* Pizzas */}
-
             <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-8">
-
-              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">
-                🍕 Pizzas
-              </h3>
-
+              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">🍕 Pizzas</h3>
               <div className="space-y-5 text-[#eee7d5]">
-
-                <div className="flex justify-between gap-4">
-                  <span>Margherita</span>
-                  <span>€ 9.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Farmhouse</span>
-                  <span>€ 11.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Veggie Delight</span>
-                  <span>€ 12.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Italian Special</span>
-                  <span>€ 13.90</span>
-                </div>
-
+                <div className="flex justify-between gap-4"><span>Margherita</span></div>
+                <div className="flex justify-between gap-4"><span>Farmhouse</span></div>
+                <div className="flex justify-between gap-4"><span>Veggie Delight</span></div>
+                <div className="flex justify-between gap-4"><span>Italian Special</span></div>
               </div>
-
             </div>
-
-
-            {/* Burgers */}
-
             <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-8">
-
-              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">
-                🍔 Burgers
-              </h3>
-
+              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">🍔 Burgers</h3>
               <div className="space-y-5 text-[#eee7d5]">
-
-                <div className="flex justify-between gap-4">
-                  <span>Classic Burger</span>
-                  <span>€ 9.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Cheese Burger</span>
-                  <span>€ 10.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Italian Burger</span>
-                  <span>€ 12.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Double Cheese</span>
-                  <span>€ 13.90</span>
-                </div>
-
+                <div className="flex justify-between gap-4"><span>Classic Burger</span></div>
+                <div className="flex justify-between gap-4"><span>Cheese Burger</span></div>
+                <div className="flex justify-between gap-4"><span>Italian Burger</span></div>
+                <div className="flex justify-between gap-4"><span>Double Cheese</span></div>
               </div>
-
             </div>
-
-
-            {/* Coffee */}
-
             <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-8">
-
-              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">
-                ☕ Coffee
-              </h3>
-
+              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">☕ Coffee</h3>
               <div className="space-y-5 text-[#eee7d5]">
-
-                <div className="flex justify-between gap-4">
-                  <span>Espresso</span>
-                  <span>€ 2.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Cappuccino</span>
-                  <span>€ 3.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Latte</span>
-                  <span>€ 4.00</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Iced Coffee</span>
-                  <span>€ 4.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Cold Coffee</span>
-                  <span>€ 4.90</span>
-                </div>
-
+                <div className="flex justify-between gap-4"><span>Espresso</span></div>
+                <div className="flex justify-between gap-4"><span>Cappuccino</span></div>
+                <div className="flex justify-between gap-4"><span>Latte</span></div>
+                <div className="flex justify-between gap-4"><span>Iced Coffee</span></div>
+                <div className="flex justify-between gap-4"><span>Cold Coffee</span></div>
               </div>
-
             </div>
-
-
-            {/* Beverages */}
-
             <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-8">
-
-              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">
-                🥤 Beverages
-              </h3>
-
+              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">🥤 Beverages</h3>
               <div className="space-y-5 text-[#eee7d5]">
-
-                <div className="flex justify-between gap-4">
-                  <span>Coke</span>
-                  <span>€ 2.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Virgin Mojito</span>
-                  <span>€ 4.90</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Mint Mojito</span>
-                  <span>€ 5.50</span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span>Lemon Mojito</span>
-                  <span>€ 5.50</span>
-                </div>
-
+                <div className="flex justify-between gap-4"><span>Coke</span></div>
+                <div className="flex justify-between gap-4"><span>Virgin Mojito</span></div>
+                <div className="flex justify-between gap-4"><span>Mint Mojito</span></div>
+                <div className="flex justify-between gap-4"><span>Lemon Mojito</span></div>
               </div>
-
             </div>
-
-
-            {/* Combos */}
-
             <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-8 md:col-span-2">
-
-              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">
-                ⭐ Bistrro Combos
-              </h3>
-
+              <h3 className="text-3xl font-bold text-[#f4b942] mb-6">⭐ Bistrro Combos</h3>
               <div className="grid md:grid-cols-2 gap-6 text-[#eee7d5]">
-
                 <div>
-
-                  <h4 className="text-xl font-semibold">
-                    Burger Combo
-                  </h4>
-
-                  <p className="text-[#d7cdb9] mt-2">
-                    Burger + Fries + Coke
-                  </p>
-
-                  <p className="text-[#f4b942] mt-2 font-bold">
-                    € 13.90
-                  </p>
-
+                  <h4 className="text-xl font-semibold">Burger Combo</h4>
+                  <p className="text-[#d7cdb9] mt-2">Burger + Fries + Coke</p>
                 </div>
-
-
                 <div>
-
-                  <h4 className="text-xl font-semibold">
-                    Pizza Combo
-                  </h4>
-
-                  <p className="text-[#d7cdb9] mt-2">
-                    Pizza + Coke
-                  </p>
-
-                  <p className="text-[#f4b942] mt-2 font-bold">
-                    € 14.90
-                  </p>
-
+                  <h4 className="text-xl font-semibold">Pizza Combo</h4>
+                  <p className="text-[#d7cdb9] mt-2">Pizza + Coke</p>
                 </div>
-
-
                 <div>
-
-                  <h4 className="text-xl font-semibold">
-                    Coffee Combo
-                  </h4>
-
-                  <p className="text-[#d7cdb9] mt-2">
-                    Cake + Cold Coffee
-                  </p>
-
-                  <p className="text-[#f4b942] mt-2 font-bold">
-                    € 8.90
-                  </p>
-
+                  <h4 className="text-xl font-semibold">Coffee Combo</h4>
+                  <p className="text-[#d7cdb9] mt-2">Cake + Cold Coffee</p>
                 </div>
-
-
                 <div>
-
-                  <h4 className="text-xl font-semibold">
-                    Bistrro Duo
-                  </h4>
-
-                  <p className="text-[#d7cdb9] mt-2">
-                    2 Burgers + 2 Coke
-                  </p>
-
-                  <p className="text-[#f4b942] mt-2 font-bold">
-                    € 24.90
-                  </p>
-
+                  <h4 className="text-xl font-semibold">Bistrro Duo</h4>
+                  <p className="text-[#d7cdb9] mt-2">2 Burgers + 2 Coke</p>
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
-
           <div className="text-center mt-12">
-
-            <p className="text-[#d7cdb9] text-lg">
-              Ask our team about today's specials.
-            </p>
-
+            <p className="text-[#d7cdb9] text-lg">Ask our team about today's specials.</p>
           </div>
-
         </div>
-
       </section>
 
 
@@ -1580,7 +1385,7 @@ export default function Page() {
             </p>
 
             <a
-              href="tel:+YOUR_PHONE_NUMBER"
+              href="tel:8380807998"
               className="inline-block mt-6 bg-[#f4b942] text-[#102820] px-8 py-4 rounded-xl font-semibold hover:opacity-80 transition"
             >
               Call For Reservation
@@ -1634,26 +1439,14 @@ export default function Page() {
               <div className="mt-5 space-y-3">
 
                 <p>
-                  The Italian Bistrro
-                </p>
-
-                <p>
-                  Your Address
-                </p>
-
-                <p>
-                  Your City
-                </p>
-
-                <p>
-                  Your Country
+                  The Italian Bistrro, Azad Rd, Gadhinglaj, Maharashtra 416502
                 </p>
 
                 <a
-                  href="tel:+YOUR_PHONE_NUMBER"
+                  href="tel:8380807998"
                   className="block hover:text-[#f4b942]"
                 >
-                  Tel: +XX XXXXX XXXXX
+                  Tel: 8380807998
                 </a>
 
               </div>
@@ -1674,45 +1467,11 @@ export default function Page() {
                 <div>
 
                   <strong className="text-[#eee7d5]">
-                    Tuesday – Saturday
+                    Everyday
                   </strong>
 
                   <p>
-                    11:30 AM – 2:30 PM
-                  </p>
-
-                  <p>
-                    6:00 PM – 10:00 PM
-                  </p>
-
-                </div>
-
-
-                <div>
-
-                  <strong className="text-[#eee7d5]">
-                    Sunday
-                  </strong>
-
-                  <p>
-                    11:30 AM – 2:30 PM
-                  </p>
-
-                  <p>
-                    6:00 PM – 9:00 PM
-                  </p>
-
-                </div>
-
-
-                <div>
-
-                  <strong className="text-[#eee7d5]">
-                    Monday
-                  </strong>
-
-                  <p>
-                    Closed
+                    10:00 AM – 9:00 PM
                   </p>
 
                 </div>
@@ -1740,7 +1499,7 @@ export default function Page() {
               </p>
 
               <a
-                href="tel:+YOUR_PHONE_NUMBER"
+                href="tel:8380807998"
                 className="inline-block mt-6 bg-[#f4b942] text-[#102820] px-6 py-3 rounded-lg font-semibold"
               >
                 Call Us
@@ -1760,7 +1519,7 @@ export default function Page() {
             </p>
 
             <p>
-              Where hunger meets happiness.
+              Designed by <a href="https://wa.me/919175282915" target="_blank" rel="noopener noreferrer" className="text-[#f4b942] hover:opacity-80 transition-opacity">ubaidSHEIKH</a>
             </p>
 
           </div>
@@ -1781,7 +1540,7 @@ export default function Page() {
             behavior: 'smooth',
           })
         }
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-xl bg-[#a77d20] text-[#102820] text-2xl font-bold shadow-lg hover:opacity-80 transition"
+        className="fixed bottom-6 right-6 z-[60] w-10 h-10 rounded-lg bg-[#a77d20] text-[#102820] text-xl font-bold shadow-lg hover:opacity-95 transition"
         aria-label="Back to top"
       >
         ↑
