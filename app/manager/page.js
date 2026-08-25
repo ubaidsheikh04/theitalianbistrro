@@ -34,21 +34,18 @@ export default function ManagerPage() {
      FETCH DATA
   ============================================================ */
 
-  const fetchData = async () => {
+  const fetchOrdersAndTables = async () => {
     try {
       const [
         ordersRes,
         tablesRes,
-        menuRes
       ] = await Promise.all([
         fetch('/api/orders'),
         fetch('/api/tables'),
-        fetch('/api/menu')
       ]);
 
       const ordersData = await ordersRes.json();
       const tablesData = await tablesRes.json();
-      const menuData = await menuRes.json();
 
       setOrders(ordersData);
 
@@ -58,22 +55,32 @@ export default function ManagerPage() {
         )
       );
 
-      setMenu(menuData);
-
     } catch (error) {
       console.error(
-        'Error fetching data:',
+        'Error fetching orders and tables:',
         error
       );
     }
   };
 
+  const fetchMenu = async () => {
+    try {
+      const menuRes = await fetch('/api/menu');
+      const menuData = await menuRes.json();
+      setMenu(menuData);
+    } catch (error) {
+      console.error('Error fetching menu:', error);
+    }
+  };
+
+
   useEffect(() => {
-    fetchData();
+    fetchOrdersAndTables();
+    fetchMenu();
 
     const interval = setInterval(
-      fetchData,
-      2000
+      fetchOrdersAndTables,
+      10000
     );
 
     return () =>
@@ -100,7 +107,7 @@ export default function ManagerPage() {
       );
 
       if (response.ok) {
-        await fetchData();
+        await fetchOrdersAndTables();
       }
 
     } catch (error) {
@@ -233,7 +240,7 @@ export default function ManagerPage() {
       setNewItemImage('');
       setShowAddItemForm(false);
 
-      await fetchData();
+      await fetchMenu();
 
     } catch (error) {
       console.error(
@@ -287,7 +294,7 @@ export default function ManagerPage() {
 
       setEditingItem(null);
 
-      await fetchData();
+      await fetchMenu();
 
     } catch (error) {
       console.error(
@@ -339,7 +346,7 @@ export default function ManagerPage() {
         );
       }
 
-      await fetchData();
+      await fetchMenu();
 
     } catch (error) {
       console.error(
