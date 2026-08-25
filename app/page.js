@@ -965,7 +965,7 @@ export default function Page() {
               About Us
             </p>
 
-            <h2 className="text-5xl md:text-7xl font-bold leading-tight text-[#eee7d5]">
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-[#eee7d5]">
               A Little Taste
               <br />
               of Italy

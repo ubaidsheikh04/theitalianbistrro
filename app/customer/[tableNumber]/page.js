@@ -261,7 +261,7 @@ export default function CustomerPage() {
         <PostOrderModal
             orderId={confirmedOrderId}
             onOk={() => {
-                window.location.href = 'https://search.google.com/local/writereview?placeid=ChIJew-CegCNwDsRwjr3NpyfcI8';
+                window.location.href = 'https://search.google.com/local/writereview?placeid=ChIJxQxs8EyPwDsRZ7rbnb1rBMc';
             }}
             onNotNow={() => {
                 setShowPostOrderModal(false);
