@@ -54,8 +54,8 @@ export default function OrbPage() {
   return (
     <div
       style={{
-        backgroundColor: '#34495e',
-        color: 'white',
+        backgroundColor: '#102820',
+        color: '#eee7d5',
         minHeight: '100vh',
         padding: '30px',
         fontFamily: "'Playfair Display', serif"
@@ -70,9 +70,9 @@ export default function OrbPage() {
           top: '10px',
           right: '10px',
           padding: '10px',
-          backgroundColor: '#2c3e50',
-          color: 'white',
-          border: 'none',
+          backgroundColor: '#0b1f18',
+          color: '#eee7d5',
+          border: '1px solid #315348',
           borderRadius: '5px',
           cursor: 'pointer',
           transition: 'opacity 0.3s ease',
@@ -91,8 +91,9 @@ export default function OrbPage() {
       <h1
         style={{
           textAlign: 'center',
-          fontSize: '3rem',
-          marginBottom: '2rem'
+          fontSize: '5rem',
+          marginBottom: '2rem',
+          color: '#f4b942'
         }}
       >
         Ready Orders
@@ -102,21 +103,22 @@ export default function OrbPage() {
         style={{
           display: 'grid',
           gridTemplateColumns:
-            'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '20px'
+            'repeat(auto-fill, minmax(350px, 1fr))',
+          gap: '30px'
         }}
       >
         {orders.map((order) => (
           <div
             key={order.id}
             style={{
-              backgroundColor: '#2c3e50',
-              padding: '20px',
-              borderRadius: '10px',
-              textAlign: 'center'
+              backgroundColor: '#0b1f18',
+              padding: '40px',
+              borderRadius: '15px',
+              textAlign: 'center',
+              border: '2px solid #315348'
             }}
           >
-            <h2 style={{ fontSize: '2rem' }}>
+            <h2 style={{ fontSize: '3rem', color: '#eee7d5' }}>
               Order #{order.orderNumber} is Ready
             </h2>
           </div>

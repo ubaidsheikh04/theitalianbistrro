@@ -1,6 +1,7 @@
 'use client';
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from 'next/navigation';
+import html2canvas from 'html2canvas';
 
 function MenuItem({ item, onUpdateQuantity, quantity }) {
   return (
@@ -22,8 +23,7 @@ function MenuItem({ item, onUpdateQuantity, quantity }) {
   );
 }
 
-function ConfirmationModal({ order, onConfirm, onCancel, total, tableNumber }) {
-    const totalItems = order.reduce((acc, item) => acc + item.quantity, 0);
+function ConfirmationModal({ order, onConfirm, onCancel, tableNumber }) {
     const [isParcel, setIsParcel] = useState(false);
 
     const handleConfirm = () => {
@@ -33,40 +33,33 @@ function ConfirmationModal({ order, onConfirm, onCancel, total, tableNumber }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#f8f1e7] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#333]">
+            <div className="bg-[#0b1f18] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#eee7d5]">
                 <h2 className="text-2xl font-bold mb-4 text-center">Confirm Your Order for Table {tableNumber}</h2>
                 {order.map(item => (
-                    <div key={item.id} className="flex justify-between py-1">
+                    <div key={item.id} className="flex justify-center py-1">
                         <span>{item.name} x {item.quantity}</span>
-                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                 ))}
-                <hr className="my-4 border-gray-400" />
-                <div className="flex justify-between font-bold text-lg">
-                    <span>Total ({totalItems} items):</span>
-                    <span>₹{total.toFixed(2)}</span>
-                </div>
-                <p className="text-right text-sm italic mt-1">*Exclusive of taxes</p>
                 <div className="mt-4 flex items-center">
                   <input
                     type="checkbox"
                     id="parcel"
                     checked={isParcel}
                     onChange={(e) => setIsParcel(e.target.checked)}
-                    className="h-5 w-5 mr-2"
+                    className="h-5 w-5 mr-2 accent-[#f4b942]"
                   />
                   <label htmlFor="parcel" className="text-lg">Parcel</label>
                 </div>
                 <div className="flex justify-end mt-6">
                     <button
                         onClick={onCancel}
-                        className="mr-4 px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 transition-colors"
+                        className="mr-4 px-4 py-2 rounded-md bg-[#315348] text-[#eee7d5] hover:bg-[#4a6b5f] transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirm}
-                        className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors"
+                        className="bg-[#f4b942] text-[#102820] font-semibold px-6 py-2 rounded-md hover:bg-[#d8a33a] transition-colors"
                     >
                         Confirm Order
                     </button>
@@ -79,20 +72,20 @@ function ConfirmationModal({ order, onConfirm, onCancel, total, tableNumber }) {
 function PostOrderModal({ onOk, onNotNow, orderId }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#f8f1e7] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#333]">
+            <div className="bg-[#0b1f18] p-8 rounded-lg shadow-lg max-w-sm w-full font-[var(--font-playfair)] text-[#eee7d5]">
                 <h2 className="text-2xl font-bold mb-4 text-center">Your order has been confirmed.</h2>
                 {orderId && <p className="text-center font-bold text-xl">Your Order Number is: {orderId}</p>}
                 <p className="text-center mt-4">Please share your experience with us.</p>
                 <div className="flex justify-center items-center mt-6">
                     <button
                         onClick={onOk}
-                        className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors"
+                        className="bg-[#f4b942] text-[#102820] font-semibold px-6 py-2 rounded-md hover:bg-[#d8a33a] transition-colors"
                     >
                         OK
                     </button>
                     <button
                         onClick={onNotNow}
-                        className="ml-4 text-sm underline"
+                        className="ml-4 text-sm underline text-[#d7cdb9]"
                     >
                         Not now
                     </button>
@@ -101,6 +94,34 @@ function PostOrderModal({ onOk, onNotNow, orderId }) {
         </div>
     );
 }
+
+const Receipt = React.forwardRef(({ order, tableNumber, orderId }, ref) => {
+    const total = order.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    return (
+        <div ref={ref} className="bg-white text-black p-4 font-mono text-sm" style={{ width: '300px' }}>
+            <div className="text-center">
+                <h2 className="text-xl font-bold">The Italian Bistrro</h2>
+                <p>Order #{orderId}</p>
+                <p>Table: {tableNumber}</p>
+                <p>{new Date().toLocaleString()}</p>
+            </div>
+            <hr className="my-2 border-black" />
+            <div>
+                {order.map(item => (
+                    <div key={item.id} className="flex justify-between">
+                        <span>{item.name} x{item.quantity}</span>
+                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                ))}
+            </div>
+            <hr className="my-2 border-black" />
+            <div className="flex justify-between font-bold">
+                <span>Total</span>
+                <span>₹{total.toFixed(2)}</span>
+            </div>
+        </div>
+    );
+});
 
 export default function CustomerPage() {
   const [menu, setMenu] = useState({});
@@ -111,6 +132,8 @@ export default function CustomerPage() {
   const params = useParams();
   const tableNumber = params.tableNumber;
   const [expanded, setExpanded] = useState({});
+  const receiptRef = useRef();
+  const [receiptDetails, setReceiptDetails] = useState(null);
 
   useEffect(() => {
     fetch('/api/menu')
@@ -179,15 +202,29 @@ export default function CustomerPage() {
     })
     .then((data) => {
         setConfirmedOrderId(data.order.id);
-        setShowPostOrderModal(true);
-        setOrder([]);
-        setShowConfirmation(false);
+        setReceiptDetails({ order: finalOrder, tableNumber: finalTableNumber, orderId: data.order.id });
     })
     .catch(error => {
         console.error('Error placing order:', error);
         alert(error.message);
     });
   };
+
+  useEffect(() => {
+    if (receiptDetails) {
+        html2canvas(receiptRef.current).then((canvas) => {
+            const imgData = canvas.toDataURL('image/jpeg');
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = `receipt-order-${receiptDetails.orderId}.jpg`;
+            link.click();
+            setShowPostOrderModal(true);
+            setOrder([]);
+            setShowConfirmation(false);
+            setReceiptDetails(null);
+        });
+    }
+  }, [receiptDetails]);
 
   const getQuantity = (itemId) => {
     const item = order.find(i => i.id === itemId);
@@ -237,10 +274,10 @@ export default function CustomerPage() {
       </div>
 
       {order.length > 0 && (
-        <div className="fixed bottom-8 left-0 right-0 bg-[#333] text-white p-5 text-center z-10">
+        <div className="fixed bottom-8 left-0 right-0 bg-[#0b1f18] p-5 text-center z-10">
           <button
             onClick={() => setShowConfirmation(true)}
-            className="bg-[#c89d7c] text-white px-6 py-2 rounded-md hover:bg-[#b38968] transition-colors mt-4"
+            className="bg-[#f4b942] text-[#102820] font-semibold px-6 py-2 rounded-md hover:bg-[#d8a33a] transition-colors mt-4"
           >
             View Order
           </button>
@@ -250,7 +287,6 @@ export default function CustomerPage() {
       {showConfirmation && (
         <ConfirmationModal
             order={order}
-            total={orderTotal}
             onConfirm={handlePlaceOrder}
             onCancel={() => setShowConfirmation(false)}
             tableNumber={tableNumber}
@@ -268,6 +304,11 @@ export default function CustomerPage() {
                 setConfirmedOrderId(null);
             }}
         />
+      )}
+      {receiptDetails && (
+          <div style={{ position: 'fixed', left: '-10000px' }}>
+              <Receipt ref={receiptRef} order={receiptDetails.order} tableNumber={receiptDetails.tableNumber} orderId={receiptDetails.orderId} />
+          </div>
       )}
       <footer className="fixed bottom-0 left-0 right-0 bg-[#102820] text-center py-2 text-sm text-[#d7cdb9] z-10">
         Designed by <a href="https://wa.me/9175282915" target="_blank" rel="noopener noreferrer" className="text-[#f4b942] hover:underline">ubaidSHEIKH</a>

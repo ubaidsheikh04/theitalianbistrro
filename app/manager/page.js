@@ -1226,8 +1226,6 @@ export default function ManagerPage() {
 
                           <ul
                             className="
-                              list-disc
-                              list-inside
                               text-sm
                             "
                           >
@@ -1240,9 +1238,10 @@ export default function ManagerPage() {
 
                                 <li
                                   key={index}
+                                  className="flex justify-between"
                                 >
-                                  {item.name} x{' '}
-                                  {item.quantity}
+                                  <span>{item.name} x {item.quantity}</span>
+                                  <span>₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
                                 </li>
 
                               )
