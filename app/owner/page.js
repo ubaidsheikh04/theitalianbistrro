@@ -11,6 +11,7 @@ const getWeekNumber = (d) => {
 
 
 export default function OwnerPage() {
+  console.log("OWNER PAGE EXECUTING");
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('daily'); // daily, weekly, monthly
