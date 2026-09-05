@@ -19,17 +19,33 @@ export default function OwnerPage() {
   const [filteredOrders, setFilteredOrders] = useState([]);
 
   useEffect(() => {
-    fetch('/api/owner/stats')
-      .then(res => res.json())
-      .then(data => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error fetching owner stats:", err);
-        setLoading(false);
-      });
-  }, []);
+    console.log("OWNER: useEffect START");
+
+    fetch("/api/owner/stats")
+        .then(res => {
+            console.log("OWNER: API STATUS", res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log("OWNER: DATA RECEIVED", data);
+            console.log("OWNER: dailySales", data?.dailySales);
+            console.log("OWNER: weeklySales", data?.weeklySales);
+            console.log("OWNER: monthlySales", data?.monthlySales);
+            console.log("OWNER: orders count", data?.orders?.length);
+
+            setStats(data);
+
+            console.log("OWNER: setStats DONE");
+
+            setLoading(false);
+
+            console.log("OWNER: setLoading(false) DONE");
+        })
+        .catch(err => {
+            console.error("OWNER: FETCH ERROR", err);
+            setLoading(false);
+        });
+}, []);
 
   const handlePeriodSelect = (period) => {
     setSelectedPeriod(period);
