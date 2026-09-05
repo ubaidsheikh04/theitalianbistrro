@@ -9,8 +9,11 @@ export default function OwnerPage() {
     const [selectedPeriod, setSelectedPeriod] = useState(null);
 
     const fetchData = () => {
-        setLoading(true);
-        fetch('/api/owner/stats')
+        // Keep setLoading(true) only for the initial load
+        if (!stats) {
+            setLoading(true);
+        }
+        fetch('/api/owner/stats', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 setStats(data);
@@ -23,7 +26,13 @@ export default function OwnerPage() {
     };
 
     useEffect(() => {
-        fetchData();
+        fetchData(); // Initial fetch
+
+        const interval = setInterval(() => {
+            fetchData();
+        }, 600000); // Refresh every 10 minutes
+
+        return () => clearInterval(interval); // Cleanup on unmount
     }, []);
 
     const salesData = useMemo(() => {
@@ -33,9 +42,8 @@ export default function OwnerPage() {
         else if (timeframe === 'monthly') data = stats.monthlySales;
         else data = stats.yearlySales;
 
-        // Ensure data is sorted correctly
         if (timeframe === 'daily') {
-            return data.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
+            return [...data].sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
         }
         return data;
 

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/database';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Fetches all orders from the Firestore 'orders' collection
 async function readOrders() {
     try {
