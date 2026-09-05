@@ -33,6 +33,30 @@ export default function OwnerPage() {
             console.log("OWNER: monthlySales", data?.monthlySales);
             console.log("OWNER: orders count", data?.orders?.length);
 
+            console.log("OWNER: dailySales TYPES",
+                data?.dailySales?.map(x => ({
+                    date: x.date,
+                    sales: x.sales,
+                    salesType: typeof x.sales
+                }))
+            );
+
+            console.log("OWNER: weeklySales TYPES",
+                data?.weeklySales?.map(x => ({
+                    week: x.week,
+                    sales: x.sales,
+                    salesType: typeof x.sales
+                }))
+            );
+
+            console.log("OWNER: monthlySales TYPES",
+                data?.monthlySales?.map(x => ({
+                    month: x.month,
+                    sales: x.sales,
+                    salesType: typeof x.sales
+                }))
+            );
+
             setStats(data);
 
             console.log("OWNER: setStats DONE");
@@ -45,7 +69,7 @@ export default function OwnerPage() {
             console.error("OWNER: FETCH ERROR", err);
             setLoading(false);
         });
-}, []);
+  }, []);
 
   const handlePeriodSelect = (period) => {
     setSelectedPeriod(period);
@@ -67,124 +91,72 @@ export default function OwnerPage() {
 
 
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen"><div className="text-xl">Loading stats...</div></div>;
-  }
-
-  if (!stats) {
-    return <div className="flex justify-center items-center min-h-screen"><div className="text-xl">Could not load stats.</div></div>;
-  }
-
-  const renderSalesTable = () => {
-    let data, keyName, header;
-    if (timeframe === 'daily') {
-      data = stats.dailySales.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
-      keyName = 'date';
-      header = 'Date';
-    } else if (timeframe === 'weekly') {
-        data = stats.weeklySales;
-        keyName = 'week';
-        header = 'Week';
-    } else {
-      data = stats.monthlySales;
-      keyName = 'month';
-      header = 'Month';
-    }
-
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">{timeframe.charAt(0).toUpperCase() + timeframe.slice(1)} Sales</h2>
-                <div className="flex space-x-2">
-                    <button onClick={() => setTimeframe('daily')} className={`px-3 py-1 rounded-md text-sm ${timeframe === 'daily' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Daily</button>
-                    <button onClick={() => setTimeframe('weekly')} className={`px-3 py-1 rounded-md text-sm ${timeframe === 'weekly' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Weekly</button>
-                    <button onClick={() => setTimeframe('monthly')} className={`px-3 py-1 rounded-md text-sm ${timeframe === 'monthly' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Monthly</button>
-                </div>
-            </div>
-            <div className="overflow-auto max-h-96">
-                <table className="w-full text-left">
-                <thead>
-                    <tr className="border-b">
-                    <th className="py-2">{header}</th>
-                    <th className="py-2 text-right">Sales (₹)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(data || []).map((item, index) => (
-                    <tr key={index} className="border-b cursor-pointer hover:bg-gray-100" onClick={() => handlePeriodSelect(item)}>
-                        <td className="py-2">{item[keyName]}</td>
-                        <td className="py-2 text-right">{(item.sales || 0).toFixed(2)}</td>
-                    </tr>
-                    ))}
-                </tbody>
-                </table>
-            </div>
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="text-xl">Loading stats...</div>
         </div>
     );
-  };
-  
-  const renderDetailedView = () => {
-    if (!selectedPeriod) return null;
+}
 
-    let periodLabel;
-    if (timeframe === 'daily') periodLabel = selectedPeriod.date;
-    else if (timeframe === 'weekly') periodLabel = selectedPeriod.week;
-    else periodLabel = selectedPeriod.month;
-
-
+if (!stats) {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">Orders for {periodLabel}</h2>
-                    <button onClick={() => setSelectedPeriod(null)} className="text-2xl font-bold">&times;</button>
-                </div>
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="border-b">
-                            <th className="py-2">Order Number</th>
-                            <th className="py-2">Items</th>
-                            <th className="py-2 text-right">Total (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredOrders.map(order => (
-                            <tr key={order.id} className="border-b">
-                                <td className="py-2">{order.orderNumber || order.id}</td>
-                                <td className="py-2">
-                                    <ul className="list-disc pl-5">
-                                        {order.items.map(item => (
-                                            <li key={item.id}>{item.name} (x{item.quantity})</li>
-                                        ))}
-                                    </ul>
-                                </td>
-                                <td className="py-2 text-right">
-                                    {order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="text-xl">Could not load stats.</div>
         </div>
-    )
-  }
+    );
+}
 
-  return (
-    <div className="p-5 md:p-10 bg-[#e9e3d9] min-h-screen font-[var(--font-playfair)] text-[#333]">
-      <h1 className="text-center mb-8 text-4xl font-bold">Owner's Dashboard</h1>
-      
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-lg shadow-lg md:col-span-2">
-          <h2 className="text-2xl font-bold mb-4">Overall Performance</h2>
-          <p className="text-lg"><strong>Total Revenue:</strong> ₹{(stats.totalRevenue || 0).toFixed(2)}</p>
-          <p className="text-lg"><strong>Total Orders:</strong> {stats.totalOrders || 0}</p>
-        </div>
+try {
+    console.log("OWNER: STARTING DASHBOARD RENDER");
 
-        <div className="md:col-span-2">
-            {renderSalesTable()}
-        </div>
-      </div>
-      {renderDetailedView()}
+    const testDaily = stats.dailySales || [];
+    const testWeekly = stats.weeklySales || [];
+    const testMonthly = stats.monthlySales || [];
+    const testOrders = stats.orders || [];
+
+    console.log("OWNER: dailySales length:", testDaily.length);
+    console.log("OWNER: weeklySales length:", testWeekly.length);
+    console.log("OWNER: monthlySales length:", testMonthly.length);
+    console.log("OWNER: orders length:", testOrders.length);
+
+    console.log("OWNER: FIRST DAILY:", testDaily[0]);
+    console.log("OWNER: FIRST WEEKLY:", testWeekly[0]);
+    console.log("OWNER: FIRST MONTHLY:", testMonthly[0]);
+    console.log("OWNER: FIRST ORDER:", testOrders[0]);
+
+} catch (renderError) {
+    console.error("OWNER: RENDER PREPARATION ERROR:", renderError);
+}
+
+return (
+    <div style={{ padding: "40px", fontSize: "30px" }}>
+        <h1>Owner Dashboard</h1>
+
+        <p>Stats loaded successfully.</p>
+
+        <p>
+            Total Revenue: ₹{stats.totalRevenue}
+        </p>
+
+        <p>
+            Total Orders: {stats.totalOrders}
+        </p>
+
+        <p>
+            Daily Sales Records: {stats.dailySales?.length}
+        </p>
+
+        <p>
+            Weekly Sales Records: {stats.weeklySales?.length}
+        </p>
+
+        <p>
+            Monthly Sales Records: {stats.monthlySales?.length}
+        </p>
+
+        <p>
+            Orders: {stats.orders?.length}
+        </p>
     </div>
-  );
+);
 }
