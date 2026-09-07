@@ -12,6 +12,8 @@ export default function ManagerPage() {
   const [tables, setTables] = useState([]);
   const [orders, setOrders] = useState([]);
   const [menu, setMenu] = useState([]);
+  const [editingOrder, setEditingOrder] = useState(null);
+
 
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
@@ -366,6 +368,75 @@ export default function ManagerPage() {
     }
   };
 
+  const handleEditOrder = (order) => {
+    setEditingOrder({ ...order });
+  };
+
+  const handleUpdateOrder = async () => {
+    if (!editingOrder) return;
+
+    try {
+      const response = await fetch(`/api/orders/${editingOrder.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items: editingOrder.items }),
+      });
+
+      if (response.ok) {
+        setEditingOrder(null);
+        await fetchOrdersAndTables();
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update order');
+      }
+    } catch (error) {
+      console.error('Error updating order:', error);
+      alert(`Failed to update order: ${error.message}`);
+    }
+  };
+
+  const handleDeleteOrderItem = (itemIndex) => {
+    setEditingOrder(prevOrder => {
+      const updatedItems = prevOrder.items.filter((_, index) => index !== itemIndex);
+      return { ...prevOrder, items: updatedItems };
+    });
+  };
+
+  const handleAddOrderItemToOrder = (menuItem) => {
+    setEditingOrder(prevOrder => {
+        const existingItem = prevOrder.items.find(item => item.id === menuItem.id);
+        let updatedItems;
+        if (existingItem) {
+            updatedItems = prevOrder.items.map(item => 
+                item.id === menuItem.id ? { ...item, quantity: item.quantity + 1 } : item
+            );
+        } else {
+            updatedItems = [...prevOrder.items, { ...menuItem, quantity: 1 }];
+        }
+        return { ...prevOrder, items: updatedItems };
+    });
+  };
+
+  const handleOrderItemQuantityChange = (itemIndex, newQuantity) => {
+    setEditingOrder(prevOrder => {
+      if (newQuantity <= 0) {
+        const updatedItems = prevOrder.items.filter((_, index) => index !== itemIndex);
+        return { ...prevOrder, items: updatedItems };
+      }
+
+      const updatedItems = prevOrder.items.map((item, index) => {
+        if (index === itemIndex) {
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      });
+      return { ...prevOrder, items: updatedItems };
+    });
+  };
+
+
   const handleDeleteOrder = async (orderId) => {
     if (!confirm('Are you sure you want to delete this order?')) {
       return;
@@ -377,6 +448,7 @@ export default function ManagerPage() {
       });
 
       if (response.ok) {
+        setEditingOrder(null);
         await fetchOrdersAndTables();
       } else {
         const data = await response.json();
@@ -1245,9 +1317,9 @@ export default function ManagerPage() {
                                 {order.status}
                               </span>
                             </p>
-                            <button onClick={() => handleDeleteOrder(order.id)} className="text-red-500 hover:text-red-700 ml-2">
+                            <button onClick={() => handleEditOrder(order)} className="text-blue-500 hover:text-blue-700 ml-2">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                               </svg>
                             </button>
                           </div>
@@ -1345,6 +1417,62 @@ export default function ManagerPage() {
         </div>
 
       </div>
+
+      {editingOrder && (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+        <div className="bg-white p-5 rounded-lg shadow-xl m-4 max-w-lg w-full">
+            <h2 className="text-2xl font-bold mb-4">Edit Order #{editingOrder.orderNumber}</h2>
+
+            <div className="mb-4">
+                <h3 className="text-lg font-semibold">Current Items</h3>
+                <ul>
+                    {editingOrder.items.map((item, index) => (
+                        <li key={index} className="flex justify-between items-center mb-2">
+                           <div class="flex items-center">
+                              <span class="w-2/3">{item.name}</span>
+                              <div class="flex items-center">
+                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity - 1)} class="px-2 py-1 border rounded-md">-</button>
+                                 <span class="px-3">{item.quantity}</span>
+                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity + 1)} class="px-2 py-1 border rounded-md">+</button>
+                              </div>
+                           </div>
+                           <button onClick={() => handleDeleteOrderItem(index)} className="text-red-500 hover:text-red-700">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                              </svg>
+                           </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="mb-4">
+                <h3 className="text-lg font-semibold">Add Item</h3>
+                <select onChange={(e) => handleAddOrderItemToOrder(JSON.parse(e.target.value))} className="w-full p-2 border rounded-md">
+                    <option value="">Select an item</option>
+                    {menu.map(item => (
+                        <option key={item.id} value={JSON.stringify(item)}>
+                            {item.name} - ₹{Number(item.price || 0).toFixed(2)}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="flex justify-end gap-4 mt-4">
+                <button onClick={() => setEditingOrder(null)} className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                    Cancel
+                </button>
+                <button onClick={() => handleDeleteOrder(editingOrder.id)} className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+                    Delete Order
+                </button>
+                <button onClick={handleUpdateOrder} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                    Update Order
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+
 
       {/* MENU MANAGEMENT */}
 
