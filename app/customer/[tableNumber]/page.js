@@ -23,7 +23,7 @@ function MenuItem({ item, onUpdateQuantity, quantity }) {
   );
 }
 
-function ConfirmationModal({ order, onConfirm, onCancel, tableNumber }) {
+function ConfirmationModal({ order, onConfirm, onCancel, tableNumber, isConfirming }) {
     const [isParcel, setIsParcel] = useState(false);
 
     const handleConfirm = () => {
@@ -54,14 +54,16 @@ function ConfirmationModal({ order, onConfirm, onCancel, tableNumber }) {
                     <button
                         onClick={onCancel}
                         className="mr-4 px-4 py-2 rounded-md bg-[#315348] text-[#eee7d5] hover:bg-[#4a6b5f] transition-colors"
+                        disabled={isConfirming}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirm}
-                        className="bg-[#f4b942] text-[#102820] font-semibold px-6 py-2 rounded-md hover:bg-[#d8a33a] transition-colors"
+                        className="bg-[#f4b942] text-[#102820] font-semibold px-6 py-2 rounded-md hover:bg-[#d8a33a] transition-colors disabled:bg-gray-400"
+                        disabled={isConfirming}
                     >
-                        Confirm Order
+                        {isConfirming ? 'Confirming...' : 'Confirm Order'}
                     </button>
                 </div>
             </div>
@@ -129,6 +131,7 @@ export default function CustomerPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPostOrderModal, setShowPostOrderModal] = useState(false);
   const [confirmedOrderId, setConfirmedOrderId] = useState(null);
+  const [isConfirming, setIsConfirming] = useState(false);
   const params = useParams();
   const tableNumber = params.tableNumber;
   const [expanded, setExpanded] = useState({});
@@ -174,6 +177,7 @@ export default function CustomerPage() {
   };
 
   const handlePlaceOrder = (finalOrder, finalTableNumber) => {
+    setIsConfirming(true);
     const itemsForAPI = finalOrder.map(item => ({
       id: item.id,
       name: item.name,
@@ -207,6 +211,7 @@ export default function CustomerPage() {
     .catch(error => {
         console.error('Error placing order:', error);
         alert(error.message);
+        setIsConfirming(false);
     });
   };
 
@@ -221,6 +226,7 @@ export default function CustomerPage() {
             setShowPostOrderModal(true);
             setOrder([]);
             setShowConfirmation(false);
+            setIsConfirming(false);
             setReceiptDetails(null);
         });
     }
@@ -290,6 +296,7 @@ export default function CustomerPage() {
             onConfirm={handlePlaceOrder}
             onCancel={() => setShowConfirmation(false)}
             tableNumber={tableNumber}
+            isConfirming={isConfirming}
         />
       )}
 
