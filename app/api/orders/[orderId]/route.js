@@ -5,7 +5,25 @@ export async function PUT(request, { params }) {
     const { orderId } = await params;
 
     try {
-        const { items } = await request.json();
+        const { items, status } = await request.json();
+
+        if (status) {
+            const orderRef = db.collection('orders').doc(orderId);
+            const orderDoc = await orderRef.get();
+
+            if (!orderDoc.exists) {
+                return NextResponse.json(
+                    { error: 'Order not found' },
+                    { status: 404 }
+                );
+            }
+
+            await orderRef.update({ status });
+
+            return NextResponse.json({
+                message: 'Order status updated successfully',
+            });
+        }
 
         if (!Array.isArray(items)) {
             return NextResponse.json(
