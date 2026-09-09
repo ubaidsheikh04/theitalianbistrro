@@ -33,8 +33,8 @@ export default function OrbPage() {
     // Fetch immediately when page opens
     fetchOrders();
 
-    // Then refresh every 10 seconds
-    const interval = setInterval(fetchOrders, 10000);
+    // Then refresh every 10 minutes
+    const interval = setInterval(fetchOrders, 600000);
 
     return () => clearInterval(interval);
   }, []);
