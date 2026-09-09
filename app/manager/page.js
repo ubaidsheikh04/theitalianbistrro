@@ -825,6 +825,44 @@ export default function ManagerPage() {
     );
   };
 
+  const createKotReceipt = (table) => {
+    const tableOrders = orders.filter(
+      (order) => table.orderIds && table.orderIds.includes(order.id)
+    );
+
+    const output = [];
+
+    // Initialize printer
+    output.push(...CMD.INIT);
+
+    // Align left
+    output.push(...CMD.ALIGN_LEFT);
+    
+    // Table
+    output.push(...CMD.BOLD_ON);
+    output.push(...encodeText(`TABLE: ${table.id}\n`));
+    output.push(...CMD.BOLD_OFF);
+
+    // Orders
+    for (const order of tableOrders) {
+      output.push(...CMD.BOLD_ON);
+      output.push(...encodeText(`ORDER #${order.orderNumber}\n`));
+      output.push(...CMD.BOLD_OFF);
+
+      output.push(...encodeText("\n"));
+
+      for (const item of order.items) {
+        output.push(...encodeText(`${item.name} x ${item.quantity}\n`));
+      }
+
+      output.push(...encodeText("\n"));
+    }
+
+    // Cut
+    output.push(...CMD.CUT);
+
+    return new Uint8Array(output);
+  };
   /* ============================================================
      FIND WRITABLE CHARACTERISTIC
   ============================================================ */
@@ -1195,6 +1233,108 @@ export default function ManagerPage() {
     }
   };
 
+  const handlePrintKot = async (table) => {
+    const tableOrders = orders.filter(
+      (order) => table.orderIds && table.orderIds.includes(order.id)
+    );
+
+    if (tableOrders.length === 0) {
+      alert("No orders to print for this table.");
+      return;
+    }
+
+    if (!("bluetooth" in navigator)) {
+      alert(
+        "Web Bluetooth is not available in this browser.\n\n" +
+          "Please use Chrome or another Chromium browser " +
+          "with Bluetooth enabled."
+      );
+
+      return;
+    }
+
+    setIsPrinting(true);
+
+    let device = null;
+
+    try {
+      console.log("Opening Bluetooth printer selector...");
+
+      device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: COMMON_PRINTER_SERVICES,
+      });
+
+      console.log("Selected Bluetooth device:", device.name);
+      console.log("Bluetooth device ID:", device.id);
+
+      if (!device.gatt) {
+        throw new Error(
+          "The selected device does not provide a GATT connection."
+        );
+      }
+
+      console.log("Connecting to printer...");
+
+      const server = await device.gatt.connect();
+
+      console.log("Connected to:", device.name);
+
+      setConnectedPrinter(device.name || "Bluetooth Printer");
+
+      const characteristic = await findWritableCharacteristic(server);
+
+      if (!characteristic) {
+        console.error("No writable Bluetooth characteristic was found.");
+        alert(
+          "MT580P2 was detected and connected, but its Bluetooth printing characteristic could not be found.\n\n" +
+            "Open F12 → Console and check the Bluetooth service information."
+        );
+        return;
+      }
+
+      console.log("PRINT CHARACTERISTIC FOUND:", characteristic.uuid);
+      console.log("Properties:", characteristic.properties);
+
+      const receiptData = createKotReceipt(table);
+
+      console.log("Receipt bytes:", receiptData.length);
+
+      await sendToPrinter(characteristic, receiptData);
+
+      console.log("Receipt successfully sent to printer.");
+
+      alert(`KOT printed successfully on ${device.name || "MT580P2"}.`);
+    } catch (error) {
+      console.error("Bluetooth printing error:", error);
+
+      if (error.name === "NotFoundError") {
+        console.log("Bluetooth printer selection cancelled.");
+        return;
+      }
+
+      if (error.name === "SecurityError") {
+        alert(
+          "Chrome blocked access to the Bluetooth printer.\n\n" +
+            "Make sure the page is running on HTTPS or localhost."
+        );
+        return;
+      }
+
+      if (error.name === "NetworkError") {
+        alert(
+          "Could not connect to MT580P2.\n\n" +
+            "Make sure the printer is powered on and paired."
+        );
+        return;
+      }
+
+      alert(`Could not print KOT.\n\n${error.message}`);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
   /* ============================================================
      UI
   ============================================================ */
@@ -1374,7 +1514,7 @@ export default function ManagerPage() {
                         transition-colors
                       "
                     >
-                      Mark as Paid
+                      Paid
                     </button>
 
                     <button
@@ -1403,7 +1543,24 @@ export default function ManagerPage() {
                         ? 'Printing...'
                         : 'Print'}
                     </button>
-
+                    <button
+                      onClick={() => handlePrintKot(table)}
+                      disabled={isPrinting}
+                      className="
+                        w-full
+                        bg-orange-500
+                        text-white
+                        px-4
+                        py-2
+                        rounded-md
+                        hover:bg-orange-600
+                        transition-colors
+                        disabled:opacity-50
+                        disabled:cursor-not-allowed
+                      "
+                    >
+                      {isPrinting ? "Printing..." : "KOT"}
+                    </button>
                   </div>
 
                 </div>
