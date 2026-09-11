@@ -69,7 +69,8 @@ export default function ManagerPage() {
     try {
       const menuRes = await fetch('/api/menu');
       const menuData = await menuRes.json();
-      setMenu(menuData);
+      const sortedMenu = menuData.sort((a, b) => a.category.localeCompare(b.category));
+      setMenu(sortedMenu);
     } catch (error) {
       console.error('Error fetching menu:', error);
     }
@@ -1359,6 +1360,14 @@ export default function ManagerPage() {
 
   const regularTables = tables.filter(table => String(table.id).toLowerCase() !== 'parcel');
   const parcelTable = tables.find(table => String(table.id).toLowerCase() === 'parcel');
+  const groupedMenu = menu.reduce((acc, item) => {
+    const category = item.category || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {});
 
   /* ============================================================
      UI
@@ -1934,318 +1943,226 @@ export default function ManagerPage() {
 
             </div>
 
-            <div
-              className="
-                grid
-                grid-cols-1
-                md:grid-cols-2
-                lg:grid-cols-3
-                xl:grid-cols-4
-                gap-6
-                mt-4
-              "
-            >
-
-              {menu.map(item => (
-
+            {Object.entries(groupedMenu).map(([category, items]) => (
+              <div key={category} className="mt-6">
+                <h3 className="text-2xl font-bold mb-4 capitalize">{category}</h3>
                 <div
-                  key={item.id}
                   className="
-                    bg-[#f8f1e7]
-                    p-4
-                    rounded-lg
-                    shadow-md
+                    grid
+                    grid-cols-1
+                    md:grid-cols-2
+                    lg:grid-cols-3
+                    xl:grid-cols-4
+                    gap-6
                   "
                 >
-
-                  {editingItem &&
-                  editingItem.id ===
-                    item.id ? (
-
-                    <form
-                      onSubmit={
-                        handleUpdateMenuItem
-                      }
+                  {items.map(item => (
+                    <div
+                      key={item.id}
+                      className="
+                        bg-[#f8f1e7]
+                        p-4
+                        rounded-lg
+                        shadow-md
+                      "
                     >
-
-                      <img
-                        src={
-                          editingItem.image ||
-                          '/placeholder.png'
-                        }
-                        alt={
-                          editingItem.name
-                        }
-                        className="
-                          w-full
-                          h-32
-                          object-cover
-                          mb-4
-                          rounded-md
-                        "
-                      />
-
-                      <input
-                        type="text"
-                        value={
-                          editingItem.name
-                        }
-                        onChange={e =>
-                          setEditingItem(
-                            prev => ({
-                              ...prev,
-                              name:
-                                e.target.value
-                            })
-                          )
-                        }
-                        placeholder="Item Name"
-                        className="
-                          w-full
-                          p-2
-                          border
-                          rounded-md
-                          mb-2
-                        "
-                        required
-                      />
-
-                      <input
-                        type="number"
-                        value={
-                          editingItem.price
-                        }
-                        onChange={e =>
-                          setEditingItem(
-                            prev => ({
-                              ...prev,
-                              price:
-                                e.target.value
-                            })
-                          )
-                        }
-                        placeholder="Price"
-                        className="
-                          w-full
-                          p-2
-                          border
-                          rounded-md
-                          mb-2
-                        "
-                        required
-                        step="0.01"
-                      />
-
-                      <input
-                        type="text"
-                        value={
-                          editingItem.category
-                        }
-                        onChange={e =>
-                          setEditingItem(
-                            prev => ({
-                              ...prev,
-                              category:
-                                e.target.value
-                            })
-                          )
-                        }
-                        placeholder="Category"
-                        className="
-                          w-full
-                          p-2
-                          border
-                          rounded-md
-                          mb-2
-                        "
-                        required
-                      />
-
-                      <input
-                        type="file"
-                        onChange={
-                          handleImageChange
-                        }
-                        className="
-                          w-full
-                          p-2
-                          border
-                          rounded-md
-                          mb-4
-                        "
-                        disabled={
-                          uploading
-                        }
-                      />
-
-                      <div
-                        className="
-                          flex
-                          justify-end
-                          gap-2
-                        "
-                      >
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditingItem(
-                              null
-                            )
-                          }
-                          className="
-                            bg-gray-500
-                            text-white
-                            px-4
-                            py-2
-                            rounded-md
-                            hover:bg-gray-600
-                          "
+                      {editingItem && editingItem.id === item.id ? (
+                        <form
+                          onSubmit={handleUpdateMenuItem}
                         >
-                          Cancel
-                        </button>
-
-                        <button
-                          type="submit"
-                          className="
-                            bg-green-500
-                            text-white
-                            px-4
-                            py-2
-                            rounded-md
-                            hover:bg-green-600
-                          "
-                          disabled={
-                            uploading ||
-                            isSubmitting
-                          }
-                        >
-                          {uploading
-                            ? 'Uploading...'
-                            : isSubmitting
-                              ? 'Saving...'
-                              : 'Save'}
-                        </button>
-
-                      </div>
-
-                    </form>
-
-                  ) : (
-
-                    <div>
-
-                      {item.image && (
-
-                        <img
-                          src={
-                            item.image
-                          }
-                          alt={
-                            item.name
-                          }
-                          className="
-                            w-full
-                            h-32
-                            object-cover
-                            mb-4
-                            rounded-md
-                          "
-                        />
-
+                          <img
+                            src={editingItem.image || '/placeholder.png'}
+                            alt={editingItem.name}
+                            className="
+                              w-full
+                              h-32
+                              object-cover
+                              mb-4
+                              rounded-md
+                            "
+                          />
+                          <input
+                            type="text"
+                            value={editingItem.name}
+                            onChange={e =>
+                              setEditingItem(
+                                prev => ({ ...prev, name: e.target.value })
+                              )
+                            }
+                            placeholder="Item Name"
+                            className="
+                              w-full
+                              p-2
+                              border
+                              rounded-md
+                              mb-2
+                            "
+                            required
+                          />
+                          <input
+                            type="number"
+                            value={editingItem.price}
+                            onChange={e =>
+                              setEditingItem(
+                                prev => ({ ...prev, price: e.target.value })
+                              )
+                            }
+                            placeholder="Price"
+                            className="
+                              w-full
+                              p-2
+                              border
+                              rounded-md
+                              mb-2
+                            "
+                            required
+                            step="0.01"
+                          />
+                          <input
+                            type="text"
+                            value={editingItem.category}
+                            onChange={e =>
+                              setEditingItem(
+                                prev => ({ ...prev, category: e.target.value })
+                              )
+                            }
+                            placeholder="Category"
+                            className="
+                              w-full
+                              p-2
+                              border
+                              rounded-md
+                              mb-2
+                            "
+                            required
+                          />
+                          <input
+                            type="file"
+                            onChange={handleImageChange}
+                            className="
+                              w-full
+                              p-2
+                              border
+                              rounded-md
+                              mb-4
+                            "
+                            disabled={uploading}
+                          />
+                          <div
+                            className="
+                              flex
+                              justify-end
+                              gap-2
+                            "
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setEditingItem(null)}
+                              className="
+                                bg-gray-500
+                                text-white
+                                px-4
+                                py-2
+                                rounded-md
+                                hover:bg-gray-600
+                              "
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              className="
+                                bg-green-500
+                                text-white
+                                px-4
+                                py-2
+                                rounded-md
+                                hover:bg-green-600
+                              "
+                              disabled={uploading || isSubmitting}
+                            >
+                              {uploading
+                                ? 'Uploading...'
+                                : isSubmitting
+                                  ? 'Saving...'
+                                  : 'Save'}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div>
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="
+                                w-full
+                                h-32
+                                object-cover
+                                mb-4
+                                rounded-md
+                              "
+                            />
+                          )}
+                          <h3 className="text-lg font-bold">{item.name}</h3>
+                          <p>
+                            ₹{Number(item.price || 0).toFixed(2)}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {item.category}
+                          </p>
+                          <div
+                            className="
+                              flex
+                              justify-end
+                              gap-2
+                              mt-4
+                            "
+                          >
+                            <button
+                              onClick={() => setEditingItem(item)}
+                              className="
+                                w-full
+                                bg-yellow-500
+                                text-white
+                                px-4
+                                py-2
+                                rounded-md
+                                hover:bg-yellow-600
+                                transition-colors
+                              "
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteMenuItem(item.id)}
+                              className="
+                                w-full
+                                bg-red-500
+                                text-white
+                                px-4
+                                py-2
+                                rounded-md
+                                hover:bg-red-600
+                                transition-colors
+                              "
+                              disabled={isDeleting[item.id]}
+                            >
+                              {isDeleting[item.id]
+                                ? 'Deleting...'
+                                : 'Delete'}
+                            </button>
+                          </div>
+                        </div>
                       )}
-
-                      <h3 className="text-lg font-bold">
-                        {item.name}
-                      </h3>
-
-                      <p>
-                        ₹
-                        {Number(
-                          item.price || 0
-                        ).toFixed(2)}
-                      </p>
-
-                      <p className="text-sm text-gray-600">
-                        {item.category}
-                      </p>
-
-                      <div
-                        className="
-                          flex
-                          justify-end
-                          gap-2
-                          mt-4
-                        "
-                      >
-
-                        <button
-                          onClick={() =>
-                            setEditingItem(
-                              item
-                            )
-                          }
-                          className="
-                            w-full
-                            bg-yellow-500
-                            text-white
-                            px-4
-                            py-2
-                            rounded-md
-                            hover:bg-yellow-600
-                            transition-colors
-                          "
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            handleDeleteMenuItem(
-                              item.id
-                            )
-                          }
-                          className="
-                            w-full
-                            bg-red-500
-                            text-white
-                            px-4
-                            py-2
-                            rounded-md
-                            hover:bg-red-600
-                            transition-colors
-                          "
-                          disabled={
-                            isDeleting[
-                              item.id
-                            ]
-                          }
-                        >
-                          {isDeleting[
-                            item.id
-                          ]
-                            ? 'Deleting...'
-                            : 'Delete'}
-                        </button>
-
-                      </div>
-
                     </div>
-
-                  )}
-
+                  ))}
                 </div>
-
-              ))}
-
-            </div>
-
+              </div>
+            ))}
           </div>
-
         )}
-
       </div>
-
     </div>
   );
 }
