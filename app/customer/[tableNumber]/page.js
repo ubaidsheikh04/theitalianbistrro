@@ -25,6 +25,8 @@ function MenuItem({ item, onUpdateQuantity, quantity }) {
 
 function ConfirmationModal({ order, onConfirm, onCancel, tableNumber, isConfirming }) {
     const [isParcel, setIsParcel] = useState(false);
+    const numberOfItems = order.reduce((acc, item) => acc + item.quantity, 0);
+    const parcelCharge = isParcel ? numberOfItems * 10 : 0;
 
     const handleConfirm = () => {
         const finalTableNumber = isParcel ? "Parcel" : tableNumber;
@@ -50,6 +52,11 @@ function ConfirmationModal({ order, onConfirm, onCancel, tableNumber, isConfirmi
                   />
                   <label htmlFor="parcel" className="text-lg">Parcel</label>
                 </div>
+                {isParcel && (
+                    <div className="text-center mt-2 text-[#f4b942]">
+                        Parcel Charge: ₹{parcelCharge.toFixed(2)}
+                    </div>
+                )}
                 <div className="flex justify-end mt-6">
                     <button
                         onClick={onCancel}

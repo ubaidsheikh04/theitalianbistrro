@@ -41,54 +41,58 @@ export async function GET() {
             orders: [],
         });
     }
+
+    // Ensure all orders have a 'total' property for backward compatibility
+    const ordersWithTotal = orders.map(order => {
+        if (order.total === undefined || order.total === null) {
+            const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const parcelCharge = order.parcelCharge || 0;
+            return { ...order, total: itemsTotal + parcelCharge };
+        }
+        return order;
+    });
     
-    const totalRevenue = orders.reduce((sum, order) => {
-        const orderTotal = order.items.reduce((s, i) => s + (i.price * i.quantity), 0);
-        return sum + orderTotal;
-    }, 0);
+    const totalRevenue = ordersWithTotal.reduce((sum, order) => sum + order.total, 0);
 
-    const totalOrders = orders.length;
+    const totalOrders = ordersWithTotal.length;
 
-    const totalItemsSold = orders.reduce((sum, order) => {
+    const totalItemsSold = ordersWithTotal.reduce((sum, order) => {
         return sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0);
     }, 0);
 
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    const dailySales = orders.reduce((acc, order) => {
+    const dailySales = ordersWithTotal.reduce((acc, order) => {
         const date = new Date(order.createdAt).toLocaleDateString('en-IN');
-        const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         if (!acc[date]) {
             acc[date] = { sales: 0, orderCount: 0 };
         }
-        acc[date].sales += orderTotal;
+        acc[date].sales += order.total;
         acc[date].orderCount += 1;
         return acc;
     }, {});
 
-    const monthlySales = orders.reduce((acc, order) => {
+    const monthlySales = ordersWithTotal.reduce((acc, order) => {
         const month = new Date(order.createdAt).toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-        const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         if (!acc[month]) {
             acc[month] = { sales: 0, orderCount: 0 };
         }
-        acc[month].sales += orderTotal;
+        acc[month].sales += order.total;
         acc[month].orderCount += 1;
         return acc;
     }, {});
 
-    const yearlySales = orders.reduce((acc, order) => {
+    const yearlySales = ordersWithTotal.reduce((acc, order) => {
         const year = new Date(order.createdAt).getFullYear();
-        const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         if (!acc[year]) {
             acc[year] = { sales: 0, orderCount: 0 };
         }
-        acc[year].sales += orderTotal;
+        acc[year].sales += order.total;
         acc[year].orderCount += 1;
         return acc;
     }, {});
 
-    const itemStats = orders.flatMap(order => order.items).reduce((acc, item) => {
+    const itemStats = ordersWithTotal.flatMap(order => order.items).reduce((acc, item) => {
         const key = item.name;
         if (!acc[key]) {
             acc[key] = { name: item.name, count: 0, revenue: 0 };
@@ -112,7 +116,7 @@ export async function GET() {
         yearlySales: Object.entries(yearlySales).map(([year, data]) => ({ year, ...data })),
         topMostOrderedItems,
         topRevenueGeneratingItems,
-        orders,
+        orders: ordersWithTotal,
     };
 
     return NextResponse.json(stats);

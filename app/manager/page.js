@@ -1645,6 +1645,16 @@ export default function ManagerPage() {
                               <span>₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
                             </li>
                           ))}
+                           {order.parcelCharge > 0 && (
+                            <li className="flex justify-between font-bold">
+                                <span>Parcel Charge</span>
+                                <span>₹{order.parcelCharge.toFixed(2)}</span>
+                            </li>
+                          )}
+                           <li className="flex justify-between font-bold border-t mt-1 pt-1">
+                                <span>Total</span>
+                                <span>₹{order.total.toFixed(2)}</span>
+                            </li>
                         </ul>
                       </div>
                     ))}

@@ -53,6 +53,12 @@ export async function POST(request) {
         const newOrderRef = db.collection('orders').doc();
         let newOrderNumber;
 
+        const isParcel = String(tableNumber).toLowerCase() === 'parcel';
+        const numberOfItems = processedItems.reduce((acc, item) => acc + item.quantity, 0);
+        const parcelCharge = isParcel ? numberOfItems * 10 : 0;
+        const orderTotal = processedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const finalOrderTotal = orderTotal + parcelCharge;
+
         await db.runTransaction(async (transaction) => {
             // All reads must be executed before all writes.
             const counterDoc = await transaction.get(counterRef);
@@ -66,31 +72,27 @@ export async function POST(request) {
             }
             newOrderNumber = lastOrderNumber + 1;
 
-            let newTotalBill = processedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            let newOrderIds = [newOrderRef.id];
-
-            if (tableDoc.exists) {
-                const tableData = tableDoc.data();
-                newTotalBill += tableData.totalBill;
-                newOrderIds = [...tableData.orderIds, newOrderRef.id];
-            }
-
             // Now, perform all write operations.
             transaction.set(newOrderRef, {
                 orderNumber: newOrderNumber,
                 createdAt: new Date().toISOString(),
                 items: processedItems,
                 status,
-                tableNumber: tableId
+                tableNumber: tableId,
+                parcelCharge: parcelCharge,
+                total: finalOrderTotal
             });
 
             transaction.set(counterRef, { lastOrderNumber: newOrderNumber }, { merge: true });
 
             if (tableDoc.exists) {
-                transaction.update(tableRef, { occupied: true, totalBill: newTotalBill, orderIds: newOrderIds });
+                const tableData = tableDoc.data();
+                const updatedTotalBill = tableData.totalBill + finalOrderTotal;
+                const updatedOrderIds = [...tableData.orderIds, newOrderRef.id];
+                transaction.update(tableRef, { occupied: true, totalBill: updatedTotalBill, orderIds: updatedOrderIds });
             } else {
-                if (tableId.toLowerCase() === 'parcel') {
-                    transaction.set(tableRef, { occupied: true, totalBill: newTotalBill, orderIds: newOrderIds });
+                if (isParcel) {
+                    transaction.set(tableRef, { occupied: true, totalBill: finalOrderTotal, orderIds: [newOrderRef.id] });
                 } else {
                     throw new Error("Table not found!");
                 }

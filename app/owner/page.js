@@ -122,9 +122,15 @@ export default function OwnerPage() {
                                     <p className="text-gray-800">₹{(item.price * item.quantity).toFixed(2)}</p>
                                 </li>
                             ))}
+                            {order.parcelCharge > 0 && (
+                                <li className="flex justify-between items-center py-2 border-b">
+                                    <p className="font-semibold">Parcel Charge</p>
+                                    <p className="text-gray-800">₹{order.parcelCharge.toFixed(2)}</p>
+                                </li>
+                            )}
                         </ul>
                         <div className="flex justify-end font-bold text-xl mt-4">
-                            Total: ₹{order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                            Total: ₹{order.total.toFixed(2)}
                         </div>
                     </div>
                 </div>
@@ -216,7 +222,7 @@ export default function OwnerPage() {
                                     <td className="py-2">{order.orderNumber || order.id}</td>
                                     <td className="py-2">{new Date(order.createdAt).toLocaleString('en-IN')}</td>
                                     <td className="py-2">{order.items.map(i => i.name).join(', ')}</td>
-                                    <td className="py-2 text-right">{order.items.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}</td>
+                                    <td className="py-2 text-right">{order.total.toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>
