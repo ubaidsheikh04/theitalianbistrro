@@ -1335,6 +1335,9 @@ export default function ManagerPage() {
     }
   };
 
+  const regularTables = tables.filter(table => String(table.id).toLowerCase() !== 'parcel');
+  const parcelTable = tables.find(table => String(table.id).toLowerCase() === 'parcel');
+
   /* ============================================================
      UI
   ============================================================ */
@@ -1389,7 +1392,7 @@ export default function ManagerPage() {
           "
         >
 
-          {tables.map(table => (
+          {regularTables.map(table => (
 
             <div
               key={table.id}
@@ -1581,6 +1584,98 @@ export default function ManagerPage() {
         </div>
 
       </div>
+
+      {/* PARCEL ORDERS */}
+      {parcelTable && parcelTable.occupied && (
+        <div className="max-w-7xl mx-auto mt-10">
+          <h2 className="text-3xl font-bold mb-4">
+            Parcels
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div
+              key={parcelTable.id}
+              className="p-4 rounded-lg shadow-md bg-blue-100 border-blue-400 border-2"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold mb-2">
+                  Parcel Orders
+                </h3>
+              </div>
+              <div>
+                <p className="font-bold text-lg">
+                  Total Bill: ₹
+                  {Number(parcelTable.totalBill || 0).toFixed(2)}
+                </p>
+                <div className="mt-2">
+                  <h4 className="font-bold">
+                    Current Orders:
+                  </h4>
+                  {orders
+                    .filter(
+                      order =>
+                        parcelTable.orderIds &&
+                        parcelTable.orderIds.includes(order.id)
+                    )
+                    .map(order => (
+                      <div
+                        key={order.id}
+                        className="mt-2 pl-4 border-l-2 border-gray-400"
+                      >
+                        <div className="flex items-center">
+                          <p className="font-semibold">
+                            Order #{order.orderNumber}
+                            {' - '}
+                            <span className="font-normal">
+                              {order.status}
+                            </span>
+                          </p>
+                          <button onClick={() => handleEditOrder(order)} className="text-blue-500 hover:text-blue-700 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                          </button>
+                        </div>
+                        <ul className="text-sm">
+                          {order.items.map((item, index) => (
+                            <li
+                              key={index}
+                              className="flex justify-between"
+                            >
+                              <span>{item.name} x {item.quantity}</span>
+                              <span>₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => handlePaid(parcelTable.id)}
+                    className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+                  >
+                    Paid
+                  </button>
+                  <button
+                    onClick={() => handlePrint(parcelTable)}
+                    disabled={isPrinting}
+                    className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isPrinting ? 'Printing...' : 'Print'}
+                  </button>
+                  <button
+                    onClick={() => handlePrintKot(parcelTable)}
+                    disabled={isPrinting}
+                    className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isPrinting ? "Printing..." : "KOT"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editingOrder && (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">

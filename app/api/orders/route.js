@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { db } from '@/database';
 
@@ -55,22 +56,24 @@ export async function POST(request) {
         await db.runTransaction(async (transaction) => {
             // All reads must be executed before all writes.
             const counterDoc = await transaction.get(counterRef);
-            
-            let tableDoc = null;
-            const tableRef = tableNumber !== "Parcel" ? db.collection('tables').doc(String(tableNumber)) : null;
-            if (tableRef) {
-                tableDoc = await transaction.get(tableRef);
-                if (!tableDoc.exists) {
-                    throw new Error("Table not found!");
-                }
-            }
+            const tableId = String(tableNumber);
+            const tableRef = db.collection('tables').doc(tableId);
+            const tableDoc = await transaction.get(tableRef);
 
-            // Calculate the new order number.
             let lastOrderNumber = 0;
             if (counterDoc.exists && counterDoc.data().lastOrderNumber) {
                 lastOrderNumber = counterDoc.data().lastOrderNumber;
             }
             newOrderNumber = lastOrderNumber + 1;
+
+            let newTotalBill = processedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            let newOrderIds = [newOrderRef.id];
+
+            if (tableDoc.exists) {
+                const tableData = tableDoc.data();
+                newTotalBill += tableData.totalBill;
+                newOrderIds = [...tableData.orderIds, newOrderRef.id];
+            }
 
             // Now, perform all write operations.
             transaction.set(newOrderRef, {
@@ -78,16 +81,19 @@ export async function POST(request) {
                 createdAt: new Date().toISOString(),
                 items: processedItems,
                 status,
-                tableNumber
+                tableNumber: tableId
             });
 
             transaction.set(counterRef, { lastOrderNumber: newOrderNumber }, { merge: true });
 
-            if (tableRef && tableDoc) {
-                const tableData = tableDoc.data();
-                const newTotalBill = tableData.totalBill + processedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-                const newOrderIds = [...tableData.orderIds, newOrderRef.id];
+            if (tableDoc.exists) {
                 transaction.update(tableRef, { occupied: true, totalBill: newTotalBill, orderIds: newOrderIds });
+            } else {
+                if (tableId.toLowerCase() === 'parcel') {
+                    transaction.set(tableRef, { occupied: true, totalBill: newTotalBill, orderIds: newOrderIds });
+                } else {
+                    throw new Error("Table not found!");
+                }
             }
         });
 
