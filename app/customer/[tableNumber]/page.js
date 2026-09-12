@@ -4,8 +4,10 @@ import { useParams } from 'next/navigation';
 import html2canvas from 'html2canvas';
 
 function MenuItem({ item, onUpdateQuantity, quantity }) {
+  const isAvailable = item.isAvailable ?? true;
+
   return (
-    <div className="bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 flex items-center justify-between">
+    <div className={`bg-[#0b1f18] border border-[#315348] rounded-2xl p-6 flex items-center justify-between ${!isAvailable ? 'opacity-50' : ''}`}>
       <div className="flex items-center">
         <img src={item.image || '/placeholder.png'} alt={item.name} className="h-16 w-16 object-cover rounded-md mr-4" />
         <div>
@@ -14,11 +16,15 @@ function MenuItem({ item, onUpdateQuantity, quantity }) {
           <p className="text-[#f4b942] mt-2 font-bold">₹{item.price.toFixed(2)}</p>
         </div>
       </div>
-      <div className="flex items-center">
-        <button onClick={() => onUpdateQuantity(item, (quantity || 0) - 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">-</button>
-        <span className="px-4 text-lg font-semibold">{quantity || 0}</span>
-        <button onClick={() => onUpdateQuantity(item, (quantity || 0) + 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">+</button>
-      </div>
+      {isAvailable ? (
+        <div className="flex items-center">
+          <button onClick={() => onUpdateQuantity(item, (quantity || 0) - 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">-</button>
+          <span className="px-4 text-lg font-semibold">{quantity || 0}</span>
+          <button onClick={() => onUpdateQuantity(item, (quantity || 0) + 1)} className="bg-[#f4b942] text-[#102820] px-3 py-1 rounded-lg font-semibold">+</button>
+        </div>
+      ) : (
+        <p className="text-red-500 font-semibold">Currently Unavailable</p>
+      )}
     </div>
   );
 }
@@ -146,7 +152,7 @@ export default function CustomerPage() {
   const [receiptDetails, setReceiptDetails] = useState(null);
 
   useEffect(() => {
-    fetch('/api/menu')
+    fetch('/api/menu', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         const categorizedMenu = data.reduce((acc, item) => {
@@ -158,7 +164,7 @@ export default function CustomerPage() {
         }, {});
         setMenu(categorizedMenu);
         const initialExpandedState = Object.keys(categorizedMenu).reduce((acc, category) => {
-            acc[category] = false;
+            acc[category] = true; // Keep categories expanded by default
             return acc;
         }, {});
         setExpanded(initialExpandedState);

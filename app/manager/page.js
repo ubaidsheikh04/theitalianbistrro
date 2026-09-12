@@ -67,7 +67,7 @@ export default function ManagerPage() {
 
   const fetchMenu = async () => {
     try {
-      const menuRes = await fetch('/api/menu');
+      const menuRes = await fetch('/api/menu', { cache: 'no-store' });
       const menuData = await menuRes.json();
       const sortedMenu = menuData.sort((a, b) => a.category.localeCompare(b.category));
       setMenu(sortedMenu);
@@ -239,7 +239,8 @@ export default function ManagerPage() {
             name: newItemName,
             price: Number(newItemPrice),
             category: newItemCategory,
-            image: newItemImage
+            image: newItemImage,
+            isAvailable: true
           })
         }
       );
@@ -388,6 +389,38 @@ export default function ManagerPage() {
         ...prev,
         [itemId]: false
       }));
+    }
+  };
+
+  const handleToggleAvailability = async (item) => {
+    const updatedItem = { ...item, isAvailable: !(item.isAvailable ?? true) };
+    const originalMenu = [...menu];
+
+    // Optimistic UI update
+    setMenu(currentMenu =>
+      currentMenu.map(menuItem =>
+        menuItem.id === item.id ? updatedItem : menuItem
+      )
+    );
+
+    try {
+      const response = await fetch('/api/menu', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedItem),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update item availability');
+      }
+    } catch (error) {
+      // Revert the change in the UI if the API call fails
+      alert(`Failed to update availability: ${error.message}. Reverting change.`);
+      console.error('Error toggling item availability:', error);
+      setMenu(originalMenu);
     }
   };
 
@@ -2133,6 +2166,16 @@ export default function ManagerPage() {
                               "
                             >
                               Edit
+                            </button>
+                            <button
+                              onClick={() => handleToggleAvailability(item)}
+                              className={`w-full text-white px-4 py-2 rounded-md transition-colors ${
+                                  (item.isAvailable ?? true)
+                                      ? 'bg-orange-500 hover:bg-orange-600'
+                                      : 'bg-green-500 hover:bg-green-600'
+                              }`}
+                              >
+                              {(item.isAvailable ?? true) ? 'Unavailable' : 'Available'}
                             </button>
                             <button
                               onClick={() => handleDeleteMenuItem(item.id)}
