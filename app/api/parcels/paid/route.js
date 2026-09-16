@@ -1,53 +1,89 @@
-
 import { NextResponse } from 'next/server';
 import { db } from '@/database';
-import { FieldValue } from 'firebase-admin/firestore';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
     const { orderId } = await request.json();
 
     if (!orderId) {
-        return new NextResponse(JSON.stringify({ message: "Order ID is required" }), { status: 400 });
+        return NextResponse.json(
+            { message: 'Order ID is required' },
+            { status: 400 }
+        );
     }
 
     try {
-        const parcelTableRef = db.collection('tables').doc('parcel');
+        const parcelRef = db.collection('tables').doc('Parcel');
+        const orderRef = db.collection('orders').doc(orderId);
 
         await db.runTransaction(async (transaction) => {
-            const parcelTableDoc = await transaction.get(parcelTableRef);
-            if (!parcelTableDoc.exists) {
-                // This should not happen if there are parcel orders, but it's good practice to handle it.
+
+            // READS FIRST
+            const parcelDoc = await transaction.get(parcelRef);
+            const orderDoc = await transaction.get(orderRef);
+
+            if (!parcelDoc.exists) {
+                throw new Error('Parcel table not found');
+            }
+
+            const parcelData = parcelDoc.data();
+            const orderIds = parcelData.orderIds || [];
+
+            // Order is already removed
+            if (!orderIds.includes(orderId)) {
                 return;
             }
 
-            const parcelTableData = parcelTableDoc.data();
+            const orderTotal = orderDoc.exists
+                ? Number(
+                    orderDoc.data().total ||
+                    orderDoc.data().totalBill ||
+                    0
+                )
+                : 0;
 
-            // Find the order to get its total
-            const orderRef = db.collection('orders').doc(orderId);
-            const orderDoc = await transaction.get(orderRef);
-            
-            // Even if the order is not found (e.g., already deleted), we proceed to remove its ID from the parcel table.
-            const orderTotal = orderDoc.exists ? orderDoc.data().total || 0 : 0;
+            const currentTotal = Number(
+                parcelData.totalBill || 0
+            );
 
-            const newTotalBill = (parcelTableData.totalBill || 0) - orderTotal;
-            
-            const newOrderIds = parcelTableData.orderIds.filter(id => id !== orderId);
+            const remainingOrderIds = orderIds.filter(
+                id => id !== orderId
+            );
 
-            const updateData = {
-                orderIds: newOrderIds,
-                totalBill: newTotalBill < 0 ? 0 : newTotalBill,
-            };
+            const newTotal = Math.max(
+                0,
+                currentTotal - orderTotal
+            );
 
-            if (newOrderIds.length === 0) {
-                updateData.occupied = false;
-            }
-            
-            transaction.update(parcelTableRef, updateData);
+            // UPDATE PARCEL
+            transaction.update(parcelRef, {
+                orderIds: remainingOrderIds,
+                totalBill: remainingOrderIds.length === 0
+                    ? 0
+                    : newTotal,
+                occupied: remainingOrderIds.length > 0
+            });
         });
 
-        return NextResponse.json({ message: "Parcel order marked as paid successfully" });
+        return NextResponse.json({
+            message: 'Parcel order marked as paid successfully'
+        });
+
     } catch (error) {
-        console.error('Failed to mark parcel order as paid:', error);
-        return new NextResponse(JSON.stringify({ message: `Failed to process payment: ${error.message}` }), { status: 500 });
+
+        console.error(
+            'Failed to mark parcel order as paid:',
+            error
+        );
+
+        return NextResponse.json(
+            {
+                message:
+                    error.message ||
+                    'Failed to process payment'
+            },
+            { status: 500 }
+        );
     }
 }
