@@ -169,109 +169,69 @@ export async function DELETE(request, { params }) {
 
         await db.runTransaction(async (transaction) => {
 
-            const orderRef =
-                db.collection('orders').doc(orderId);
-
-            const orderDoc =
-                await transaction.get(orderRef);
+            const orderRef = db.collection('orders').doc(orderId);
+            const orderDoc = await transaction.get(orderRef);
 
             if (!orderDoc.exists) {
                 return;
             }
 
             const orderData = orderDoc.data();
-
             let tableRef = null;
             let tableDoc = null;
-            let newOrderIds = [];
             let orderDocs = [];
+            let newOrderIds = [];
 
             // ========================================================
-            // READ TABLE BEFORE ANY WRITES
+            // ALL READS MUST BE FIRST
             // ========================================================
 
             if (orderData.tableNumber) {
-
-                tableRef = db
-                    .collection('tables')
-                    .doc(String(orderData.tableNumber));
-
-                tableDoc =
-                    await transaction.get(tableRef);
+                tableRef = db.collection('tables').doc(String(orderData.tableNumber));
+                tableDoc = await transaction.get(tableRef);
 
                 if (tableDoc.exists) {
-
-                    const tableData =
-                        tableDoc.data();
-
-                    const orderIds =
-                        tableData.orderIds || [];
-
-                    newOrderIds =
-                        orderIds.filter(
-                            id => id !== orderId
-                        );
+                    const tableData = tableDoc.data();
+                    const orderIds = tableData.orderIds || [];
+                    newOrderIds = orderIds.filter(id => id !== orderId);
 
                     if (newOrderIds.length > 0) {
-
-                        const orderRefs =
-                            newOrderIds.map(id =>
-                                db
-                                    .collection('orders')
-                                    .doc(id)
-                            );
-
-                        orderDocs =
-                            await transaction.getAll(
-                                ...orderRefs
-                            );
+                        const orderRefs = newOrderIds.map(id => db.collection('orders').doc(id));
+                        orderDocs = await transaction.getAll(...orderRefs);
                     }
                 }
             }
 
             // ========================================================
-            // DELETE ORDER
+            // NOW PERFORM ALL WRITES
             // ========================================================
 
+            // 1. Archive the order
+            const deletedOrderRef = db.collection('deleted-orders').doc(orderId);
+            transaction.set(deletedOrderRef, { ...orderData, deletedAt: new Date() });
+
+            // 2. Delete the original order
             transaction.delete(orderRef);
 
-            // ========================================================
-            // UPDATE TABLE
-            // ========================================================
-
+            // 3. Update the table
             if (tableDoc && tableDoc.exists) {
-
                 if (newOrderIds.length === 0) {
-
                     transaction.update(tableRef, {
                         orderIds: [],
                         totalBill: 0,
-                        occupied: false
+                        occupied: false,
                     });
-
                 } else {
-
-                    const newTableTotal =
-                        orderDocs.reduce(
-                            (sum, doc) => {
-
-                                if (doc.exists) {
-                                    return (
-                                        sum +
-                                        (Number(
-                                            doc.data().totalBill
-                                        ) || 0)
-                                    );
-                                }
-
-                                return sum;
-                            },
-                            0
-                        );
+                    const newTableTotal = orderDocs.reduce((sum, doc) => {
+                        if (doc.exists) {
+                            return sum + (Number(doc.data().totalBill) || 0);
+                        }
+                        return sum;
+                    }, 0);
 
                     transaction.update(tableRef, {
                         orderIds: newOrderIds,
-                        totalBill: newTableTotal
+                        totalBill: newTableTotal,
                     });
                 }
             }
