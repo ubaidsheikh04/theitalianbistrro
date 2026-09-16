@@ -122,6 +122,9 @@ export default function ManagerPage() {
   };
 
   const handleParcelPaid = async (orderId) => {
+    const originalOrders = [...orders];
+    setOrders(currentOrders => currentOrders.filter(order => order.id !== orderId));
+
     try {
       const response = await fetch('/api/parcels/paid', {
         method: 'POST',
@@ -131,15 +134,14 @@ export default function ManagerPage() {
         body: JSON.stringify({ orderId }),
       });
 
-      if (response.ok) {
-        await fetchOrdersAndTables();
-      } else {
+      if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || 'Failed to mark parcel order as paid');
       }
     } catch (error) {
       console.error('Error marking parcel order as paid:', error);
       alert(`Failed to process payment: ${error.message}`);
+      setOrders(originalOrders);
     }
   };
 
