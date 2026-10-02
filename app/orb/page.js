@@ -10,7 +10,7 @@ export default function OrbPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/orb/orders');
 
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}`);
@@ -20,11 +20,7 @@ export default function OrbPage() {
 
         const data = text ? JSON.parse(text) : [];
 
-        const readyOrders = data.filter(
-          (order) => order.status === 'completed'
-        );
-
-        setOrders(readyOrders);
+        setOrders(data);
       } catch (err) {
         console.error('Orders API failed:', err);
       }
