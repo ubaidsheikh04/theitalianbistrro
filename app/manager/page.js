@@ -1,12 +1,12 @@
-'use client';
+\'use client\';
 
-import { useState, useEffect } from 'react';
-import { storage } from '@/lib/firebase';
+import { useState, useEffect } from \'react\';
+import { storage } from \'@/lib/firebase\';
 import {
   ref,
   uploadBytes,
   getDownloadURL
-} from 'firebase/storage';
+} from \'firebase/storage\';
 
 export default function ManagerPage() {
   const [tables, setTables] = useState([]);
@@ -17,10 +17,10 @@ export default function ManagerPage() {
 
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
-  const [newItemName, setNewItemName] = useState('');
-  const [newItemPrice, setNewItemPrice] = useState('');
-  const [newItemCategory, setNewItemCategory] = useState('');
-  const [newItemImage, setNewItemImage] = useState('');
+  const [newItemName, setNewItemName] = useState(\'\');
+  const [newItemPrice, setNewItemPrice] = useState(\'\');
+  const [newItemCategory, setNewItemCategory] = useState(\'\');
+  const [newItemImage, setNewItemImage] = useState(\'\');
 
   const [showAddItemForm, setShowAddItemForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -42,8 +42,8 @@ export default function ManagerPage() {
         ordersRes,
         tablesRes,
       ] = await Promise.all([
-        fetch('/api/orders'),
-        fetch('/api/tables'),
+        fetch(\'/api/orders\'),
+        fetch(\'/api/tables\'),
       ]);
 
       const ordersData = await ordersRes.json();
@@ -59,7 +59,7 @@ export default function ManagerPage() {
 
     } catch (error) {
       console.error(
-        'Error fetching orders and tables:',
+        \'Error fetching orders and tables:\',
         error
       );
     }
@@ -67,12 +67,12 @@ export default function ManagerPage() {
 
   const fetchMenu = async () => {
     try {
-      const menuRes = await fetch('/api/menu', { cache: 'no-store' });
+      const menuRes = await fetch(\'/api/menu\', { cache: \'no-store\' });
       const menuData = await menuRes.json();
       const sortedMenu = menuData.sort((a, b) => a.category.localeCompare(b.category));
       setMenu(sortedMenu);
     } catch (error) {
-      console.error('Error fetching menu:', error);
+      console.error(\'Error fetching menu:\', error);
     }
   };
 
@@ -83,7 +83,7 @@ export default function ManagerPage() {
 
     const interval = setInterval(
       fetchOrdersAndTables,
-      10000
+      30000
     );
 
     return () =>
@@ -97,11 +97,11 @@ export default function ManagerPage() {
   const handlePaid = async (tableId) => {
     try {
       const response = await fetch(
-        '/api/tables/paid',
+        \'/api/tables/paid\',
         {
-          method: 'POST',
+          method: \'POST\',
           headers: {
-            'Content-Type': 'application/json'
+            \'Content-Type\': \'application/json\'
           },
           body: JSON.stringify({
             tableId
@@ -115,7 +115,7 @@ export default function ManagerPage() {
 
     } catch (error) {
       console.error(
-        'Error marking table as paid:',
+        \'Error marking table as paid:\',
         error
       );
     }
@@ -126,20 +126,20 @@ export default function ManagerPage() {
     setOrders(currentOrders => currentOrders.filter(order => order.id !== orderId));
 
     try {
-      const response = await fetch('/api/parcels/paid', {
-        method: 'POST',
+      const response = await fetch(\'/api/parcels/paid\', {
+        method: \'POST\',
         headers: {
-          'Content-Type': 'application/json',
+          \'Content-Type\': \'application/json\',
         },
         body: JSON.stringify({ orderId }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Failed to mark parcel order as paid');
+        throw new Error(data.message || \'Failed to mark parcel order as paid\');
       }
     } catch (error) {
-      console.error('Error marking parcel order as paid:', error);
+      console.error(\'Error marking parcel order as paid:\', error);
       alert(`Failed to process payment: ${error.message}`);
       setOrders(originalOrders);
     }
@@ -168,7 +168,7 @@ export default function ManagerPage() {
       );
 
       console.log(
-        'Image uploaded:',
+        \'Image uploaded:\',
         snapshot.metadata.fullPath
       );
 
@@ -178,7 +178,7 @@ export default function ManagerPage() {
         );
 
       console.log(
-        'Image URL:',
+        \'Image URL:\',
         downloadURL
       );
 
@@ -193,7 +193,7 @@ export default function ManagerPage() {
 
     } catch (error) {
       console.error(
-        'Error uploading image:',
+        \'Error uploading image:\',
         error
       );
 
@@ -215,14 +215,14 @@ export default function ManagerPage() {
 
     if (uploading) {
       alert(
-        'Please wait for the image to finish uploading.'
+        \'Please wait for the image to finish uploading.\'
       );
       return;
     }
 
     if (!newItemImage) {
       alert(
-        'Please upload an image first.'
+        \'Please upload an image first.\'
       );
       return;
     }
@@ -231,11 +231,11 @@ export default function ManagerPage() {
 
     try {
       const response = await fetch(
-        '/api/menu',
+        \'/api/menu\',
         {
-          method: 'POST',
+          method: \'POST\',
           headers: {
-            'Content-Type': 'application/json'
+            \'Content-Type\': \'application/json\'
           },
           body: JSON.stringify({
             name: newItemName,
@@ -250,7 +250,7 @@ export default function ManagerPage() {
       const data = await response.json();
 
       console.log(
-        'POST /api/menu:',
+        \'POST /api/menu:\',
         response.status,
         data
       );
@@ -258,21 +258,21 @@ export default function ManagerPage() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-          'Failed to save menu item'
+          \'Failed to save menu item\'
         );
       }
 
-      setNewItemName('');
-      setNewItemPrice('');
-      setNewItemCategory('');
-      setNewItemImage('');
+      setNewItemName(\'\');
+      setNewItemPrice(\'\');
+      setNewItemCategory(\'\');
+      setNewItemImage(\'\');
       setShowAddItemForm(false);
 
       await fetchMenu();
 
     } catch (error) {
       console.error(
-        'Error adding menu item:',
+        \'Error adding menu item:\',
         error
       );
 
@@ -296,16 +296,16 @@ export default function ManagerPage() {
 
     try {
       console.log(
-        'Sending update request:',
+        \'Sending update request:\',
         editingItem
       );
 
       const response = await fetch(
-        '/api/menu',
+        \'/api/menu\',
         {
-          method: 'PUT',
+          method: \'PUT\',
           headers: {
-            'Content-Type': 'application/json'
+            \'Content-Type\': \'application/json\'
           },
           body: JSON.stringify(editingItem)
         }
@@ -316,7 +316,7 @@ export default function ManagerPage() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-          'Failed to update menu item'
+          \'Failed to update menu item\'
         );
       }
 
@@ -326,7 +326,7 @@ export default function ManagerPage() {
 
     } catch (error) {
       console.error(
-        'Error updating menu item:',
+        \'Error updating menu item:\',
         error
       );
 
@@ -346,7 +346,7 @@ export default function ManagerPage() {
   const handleDeleteMenuItem = async (itemId) => {
     if (
       !confirm(
-        'Are you sure you want to delete this item?'
+        \'Are you sure you want to delete this item?\'
       )
     ) {
       return;
@@ -361,7 +361,7 @@ export default function ManagerPage() {
       const response = await fetch(
         `/api/menu?id=${itemId}`,
         {
-          method: 'DELETE'
+          method: \'DELETE\'
         }
       );
 
@@ -370,7 +370,7 @@ export default function ManagerPage() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-          'Failed to delete menu item'
+          \'Failed to delete menu item\'
         );
       }
 
@@ -378,7 +378,7 @@ export default function ManagerPage() {
 
     } catch (error) {
       console.error(
-        'Error deleting menu item:',
+        \'Error deleting menu item:\',
         error
       );
 
@@ -406,22 +406,22 @@ export default function ManagerPage() {
     );
 
     try {
-      const response = await fetch('/api/menu', {
-        method: 'PUT',
+      const response = await fetch(\'/api/menu\', {
+        method: \'PUT\',
         headers: {
-          'Content-Type': 'application/json',
+          \'Content-Type\': \'application/json\',
         },
         body: JSON.stringify(updatedItem),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update item availability');
+        throw new Error(data.error || \'Failed to update item availability\');
       }
     } catch (error) {
       // Revert the change in the UI if the API call fails
       alert(`Failed to update availability: ${error.message}. Reverting change.`);
-      console.error('Error toggling item availability:', error);
+      console.error(\'Error toggling item availability:\', error);
       setMenu(originalMenu);
     }
   };
@@ -435,9 +435,9 @@ export default function ManagerPage() {
 
     try {
       const response = await fetch(`/api/orders/${editingOrder.id}`, {
-        method: 'PUT',
+        method: \'PUT\',
         headers: {
-          'Content-Type': 'application/json',
+          \'Content-Type\': \'application/json\',
         },
         body: JSON.stringify({ items: editingOrder.items }),
       });
@@ -447,10 +447,10 @@ export default function ManagerPage() {
         await fetchOrdersAndTables();
       } else {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update order');
+        throw new Error(data.error || \'Failed to update order\');
       }
     } catch (error) {
-      console.error('Error updating order:', error);
+      console.error(\'Error updating order:\', error);
       alert(`Failed to update order: ${error.message}`);
     }
   };
@@ -496,13 +496,13 @@ export default function ManagerPage() {
 
 
   const handleDeleteOrder = async (orderId) => {
-    if (!confirm('Are you sure you want to delete this order?')) {
+    if (!confirm(\'Are you sure you want to delete this order?\')) {
       return;
     }
 
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'DELETE',
+        method: \'DELETE\',
       });
 
       if (response.ok) {
@@ -510,10 +510,10 @@ export default function ManagerPage() {
         await fetchOrdersAndTables();
       } else {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to delete order');
+        throw new Error(data.error || \'Failed to delete order\');
       }
     } catch (error) {
-      console.error('Error deleting order:', error);
+      console.error(\'Error deleting order:\', error);
       alert(`Failed to delete order: ${error.message}`);
     }
   };
@@ -523,11 +523,11 @@ export default function ManagerPage() {
   ============================================================ */
 
   const COMMON_PRINTER_SERVICES = [
-    '0000ffe0-0000-1000-8000-00805f9b34fb',
-    '0000ff00-0000-1000-8000-00805f9b34fb',
-    '000018f0-0000-1000-8000-00805f9b34fb',
-    '49535343-fe7d-4ae5-8fa9-9fafd205e455',
-    'e7810a71-73ae-499d-8c15-faa9e2c3f8c1'
+    \'0000ffe0-0000-1000-8000-00805f9b34fb\',
+    \'0000ff00-0000-1000-8000-00805f9b34fb\',
+    \'000018f0-0000-1000-8000-00805f9b34fb\',
+    \'49535343-fe7d-4ae5-8fa9-9fafd205e455\',
+    \'e7810a71-73ae-499d-8c15-faa9e2c3f8c1\'
   ];
 
   const textEncoder =
@@ -649,14 +649,14 @@ export default function ManagerPage() {
 
     return (
       left +
-      ' '.repeat(
+      \' \'.repeat(
         Math.max(
           1,
           spaces
         )
       ) +
       right +
-      '\n'
+      \'\\n\'
     );
   };
 
@@ -678,14 +678,14 @@ export default function ManagerPage() {
 
     const dateTime =
       new Date().toLocaleString(
-        'en-IN',
+        \'en-IN\',
         {
           timeZone:
-            'Asia/Kolkata',
+            \'Asia/Kolkata\',
           dateStyle:
-            'short',
+            \'short\',
           timeStyle:
-            'short'
+            \'short\'
         }
       );
 
@@ -712,7 +712,7 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        'THE ITALIAN BISTRRO\n'
+        \'THE ITALIAN BISTRRO\\n\'
       )
     );
 
@@ -726,13 +726,13 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        `${dateTime}\n`
+        `${dateTime}\\n`
       )
     );
 
     output.push(
       ...encodeText(
-        '--------------------------------\n'
+        \'--------------------------------\\n\'
       )
     );
 
@@ -747,7 +747,7 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        `TABLE: ${table.id}\n`
+        `TABLE: ${table.id}\\n`
       )
     );
 
@@ -757,7 +757,7 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        '--------------------------------\n'
+        \'--------------------------------\\n\'
       )
     );
 
@@ -771,7 +771,7 @@ export default function ManagerPage() {
 
       output.push(
         ...encodeText(
-          `ORDER #${order.orderNumber}\n`
+          `ORDER #${order.orderNumber}\\n`
         )
       );
 
@@ -781,13 +781,13 @@ export default function ManagerPage() {
 
       output.push(
         ...encodeText(
-          `Status: ${order.status}\n`
+          `Status: ${order.status}\\n`
         )
       );
 
       output.push(
         ...encodeText(
-          '\n'
+          \'\\n\'
         )
       );
 
@@ -814,7 +814,7 @@ export default function ManagerPage() {
 
       output.push(
         ...encodeText(
-          '--------------------------------\n'
+          \'--------------------------------\\n\'
         )
       );
     }
@@ -832,7 +832,7 @@ export default function ManagerPage() {
     output.push(
       ...encodeText(
         receiptLine(
-          'TOTAL BILL:',
+          \'TOTAL BILL:\',
           `Rs.${Number(
             table.totalBill || 0
           ).toFixed(2)}`
@@ -846,7 +846,7 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        '--------------------------------\n'
+        \'--------------------------------\\n\'
       )
     );
 
@@ -857,19 +857,19 @@ export default function ManagerPage() {
 
     output.push(
       ...encodeText(
-        '\nThank You!!\n'
+        \'\\nThank You!!\\n\'
       )
     );
 
     output.push(
       ...encodeText(
-        'Visit Again!\n'
+        \'Visit Again!\\n\'
       )
     );
 
     output.push(
       ...encodeText(
-        '\n\n\n'
+        \'\\n\\n\\n\'
       )
     );
 
@@ -898,22 +898,22 @@ export default function ManagerPage() {
     
     // Table
     output.push(...CMD.BOLD_ON);
-    output.push(...encodeText(`TABLE: ${table.id}\n`));
+    output.push(...encodeText(`TABLE: ${table.id}\\n`));
     output.push(...CMD.BOLD_OFF);
 
     // Orders
     for (const order of tableOrders) {
       output.push(...CMD.BOLD_ON);
-      output.push(...encodeText(`ORDER #${order.orderNumber}\n`));
+      output.push(...encodeText(`ORDER #${order.orderNumber}\\n`));
       output.push(...CMD.BOLD_OFF);
 
-      output.push(...encodeText("\n"));
+      output.push(...encodeText(\"\\n\"));
 
       for (const item of order.items) {
-        output.push(...encodeText(`${item.name} x ${item.quantity}\n`));
+        output.push(...encodeText(`${item.name} x ${item.quantity}\\n`));
       }
 
-      output.push(...encodeText("\n"));
+      output.push(...encodeText(\"\\n\"));
     }
 
     // Cut
@@ -929,7 +929,7 @@ export default function ManagerPage() {
     async (server) => {
 
       console.log(
-        'Searching for printer services...'
+        \'Searching for printer services...\'
       );
 
       for (
@@ -938,7 +938,7 @@ export default function ManagerPage() {
       ) {
         try {
           console.log(
-            'Trying service:',
+            \'Trying service:\',
             serviceUUID
           );
 
@@ -948,7 +948,7 @@ export default function ManagerPage() {
             );
 
           console.log(
-            'FOUND SERVICE:',
+            \'FOUND SERVICE:\',
             serviceUUID
           );
 
@@ -960,7 +960,7 @@ export default function ManagerPage() {
             of characteristics
           ) {
             console.log(
-              'Characteristic:',
+              \'Characteristic:\',
               characteristic.uuid,
               characteristic.properties
             );
@@ -982,7 +982,7 @@ export default function ManagerPage() {
 
         } catch (error) {
           console.log(
-            'Service not available:',
+            \'Service not available:\',
             serviceUUID
           );
         }
@@ -997,7 +997,7 @@ export default function ManagerPage() {
           await server.getPrimaryServices();
 
         console.log(
-          'Accessible Bluetooth services:',
+          \'Accessible Bluetooth services:\',
           services
         );
 
@@ -1006,7 +1006,7 @@ export default function ManagerPage() {
           of services
         ) {
           console.log(
-            'SERVICE:',
+            \'SERVICE:\',
             service.uuid
           );
 
@@ -1018,7 +1018,7 @@ export default function ManagerPage() {
             of characteristics
           ) {
             console.log(
-              'CHARACTERISTIC:',
+              \'CHARACTERISTIC:\',
               characteristic.uuid,
               characteristic.properties
             );
@@ -1036,7 +1036,7 @@ export default function ManagerPage() {
 
       } catch (error) {
         console.error(
-          'Could not inspect services:',
+          \'Could not inspect services:\',
           error
         );
       }
@@ -1113,18 +1113,18 @@ export default function ManagerPage() {
       tableOrders.length === 0
     ) {
       alert(
-        'No orders to print for this table.'
+        \'No orders to print for this table.\'
       );
       return;
     }
 
     if (
-      !('bluetooth' in navigator)
+      !(\'bluetooth\' in navigator)
     ) {
       alert(
-        'Web Bluetooth is not available in this browser.\n\n' +
-        'Please use Chrome or another Chromium browser ' +
-        'with Bluetooth enabled.'
+        \'Web Bluetooth is not available in this browser.\\n\\n\' +
+        \'Please use Chrome or another Chromium browser \' +
+        \'with Bluetooth enabled.\'
       );
 
       return;
@@ -1137,7 +1137,7 @@ export default function ManagerPage() {
     try {
 
       console.log(
-        'Opening Bluetooth printer selector...'
+        \'Opening Bluetooth printer selector...\'
       );
 
       device =
@@ -1149,12 +1149,12 @@ export default function ManagerPage() {
         });
 
       console.log(
-        'Selected Bluetooth device:',
+        \'Selected Bluetooth device:\',
         device.name
       );
 
       console.log(
-        'Bluetooth device ID:',
+        \'Bluetooth device ID:\',
         device.id
       );
 
@@ -1162,25 +1162,25 @@ export default function ManagerPage() {
         !device.gatt
       ) {
         throw new Error(
-          'The selected device does not provide a GATT connection.'
+          \'The selected device does not provide a GATT connection.\'
         );
       }
 
       console.log(
-        'Connecting to printer...'
+        \'Connecting to printer...\'
       );
 
       const server =
         await device.gatt.connect();
 
       console.log(
-        'Connected to:',
+        \'Connected to:\',
         device.name
       );
 
       setConnectedPrinter(
         device.name ||
-        'Bluetooth Printer'
+        \'Bluetooth Printer\'
       );
 
       const characteristic =
@@ -1193,24 +1193,24 @@ export default function ManagerPage() {
       ) {
 
         console.error(
-          'No writable Bluetooth characteristic was found.'
+          \'No writable Bluetooth characteristic was found.\'
         );
 
         alert(
-          'MT580P2 was detected and connected, but its Bluetooth printing characteristic could not be found.\n\n' +
-          'Open F12 → Console and check the Bluetooth service information.'
+          \'MT580P2 was detected and connected, but its Bluetooth printing characteristic could not be found.\\n\\n\' +
+          \'Open F12 → Console and check the Bluetooth service information.\'
         );
 
         return;
       }
 
       console.log(
-        'PRINT CHARACTERISTIC FOUND:',
+        \'PRINT CHARACTERISTIC FOUND:\',
         characteristic.uuid
       );
 
       console.log(
-        'Properties:',
+        \'Properties:\',
         characteristic.properties
       );
 
@@ -1220,7 +1220,7 @@ export default function ManagerPage() {
         );
 
       console.log(
-        'Receipt bytes:',
+        \'Receipt bytes:\',
         receiptData.length
       );
 
@@ -1230,29 +1230,29 @@ export default function ManagerPage() {
       );
 
       console.log(
-        'Receipt successfully sent to printer.'
+        \'Receipt successfully sent to printer.\'
       );
 
       alert(
         `Receipt printed successfully on ${
           device.name ||
-          'MT580P2'
+          \'MT580P2\'
         }.`
       );
 
     } catch (error) {
 
       console.error(
-        'Bluetooth printing error:',
+        \'Bluetooth printing error:\',
         error
       );
 
       if (
         error.name ===
-        'NotFoundError'
+        \'NotFoundError\'
       ) {
         console.log(
-          'Bluetooth printer selection cancelled.'
+          \'Bluetooth printer selection cancelled.\'
         );
 
         return;
@@ -1260,11 +1260,11 @@ export default function ManagerPage() {
 
       if (
         error.name ===
-        'SecurityError'
+        \'SecurityError\'
       ) {
         alert(
-          'Chrome blocked access to the Bluetooth printer.\n\n' +
-          'Make sure the page is running on HTTPS or localhost.'
+          \'Chrome blocked access to the Bluetooth printer.\\n\\n\' +
+          \'Make sure the page is running on HTTPS or localhost.\'
         );
 
         return;
@@ -1272,18 +1272,18 @@ export default function ManagerPage() {
 
       if (
         error.name ===
-        'NetworkError'
+        \'NetworkError\'
       ) {
         alert(
-          'Could not connect to MT580P2.\n\n' +
-          'Make sure the printer is powered on and paired.'
+          \'Could not connect to MT580P2.\\n\\n\' +
+          \'Make sure the printer is powered on and paired.\'
         );
 
         return;
       }
 
       alert(
-        `Could not print receipt.\n\n${error.message}`
+        `Could not print receipt.\\n\\n${error.message}`
       );
 
     } finally {
@@ -1297,15 +1297,15 @@ export default function ManagerPage() {
     );
 
     if (tableOrders.length === 0) {
-      alert("No orders to print for this table.");
+      alert(\"No orders to print for this table.\");
       return;
     }
 
-    if (!("bluetooth" in navigator)) {
+    if (!(\"bluetooth\" in navigator)) {
       alert(
-        "Web Bluetooth is not available in this browser.\n\n" +
-          "Please use Chrome or another Chromium browser " +
-          "with Bluetooth enabled."
+        \"Web Bluetooth is not available in this browser.\\n\\n\" +
+          \"Please use Chrome or another Chromium browser \" +
+          \"with Bluetooth enabled.\"
       );
 
       return;
@@ -1316,87 +1316,87 @@ export default function ManagerPage() {
     let device = null;
 
     try {
-      console.log("Opening Bluetooth printer selector...");
+      console.log(\"Opening Bluetooth printer selector...\");
 
       device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: COMMON_PRINTER_SERVICES,
       });
 
-      console.log("Selected Bluetooth device:", device.name);
-      console.log("Bluetooth device ID:", device.id);
+      console.log(\"Selected Bluetooth device:\", device.name);
+      console.log(\"Bluetooth device ID:\", device.id);
 
       if (!device.gatt) {
         throw new Error(
-          "The selected device does not provide a GATT connection."
+          \"The selected device does not provide a GATT connection.\"
         );
       }
 
-      console.log("Connecting to printer...");
+      console.log(\"Connecting to printer...\");
 
       const server = await device.gatt.connect();
 
-      console.log("Connected to:", device.name);
+      console.log(\"Connected to:\", device.name);
 
-      setConnectedPrinter(device.name || "Bluetooth Printer");
+      setConnectedPrinter(device.name || \"Bluetooth Printer\");
 
       const characteristic = await findWritableCharacteristic(server);
 
       if (!characteristic) {
-        console.error("No writable Bluetooth characteristic was found.");
+        console.error(\"No writable Bluetooth characteristic was found.\");
         alert(
-          "MT580P2 was detected and connected, but its Bluetooth printing characteristic could not be found.\n\n" +
-            "Open F12 → Console and check the Bluetooth service information."
+          \"MT580P2 was detected and connected, but its Bluetooth printing characteristic could not be found.\\n\\n\" +
+            \"Open F12 → Console and check the Bluetooth service information.\"
         );
         return;
       }
 
-      console.log("PRINT CHARACTERISTIC FOUND:", characteristic.uuid);
-      console.log("Properties:", characteristic.properties);
+      console.log(\"PRINT CHARACTERISTIC FOUND:\", characteristic.uuid);
+      console.log(\"Properties:\", characteristic.properties);
 
       const receiptData = createKotReceipt(table);
 
-      console.log("Receipt bytes:", receiptData.length);
+      console.log(\"Receipt bytes:\", receiptData.length);
 
       await sendToPrinter(characteristic, receiptData);
 
-      console.log("Receipt successfully sent to printer.");
+      console.log(\"Receipt successfully sent to printer.\");
 
-      alert(`KOT printed successfully on ${device.name || "MT580P2"}.`);
+      alert(`KOT printed successfully on ${device.name || \"MT580P2\"}.`);
     } catch (error) {
-      console.error("Bluetooth printing error:", error);
+      console.error(\"Bluetooth printing error:\", error);
 
-      if (error.name === "NotFoundError") {
-        console.log("Bluetooth printer selection cancelled.");
+      if (error.name === \"NotFoundError\") {
+        console.log(\"Bluetooth printer selection cancelled.\");
         return;
       }
 
-      if (error.name === "SecurityError") {
+      if (error.name === \"SecurityError\") {
         alert(
-          "Chrome blocked access to the Bluetooth printer.\n\n" +
-            "Make sure the page is running on HTTPS or localhost."
+          \"Chrome blocked access to the Bluetooth printer.\\n\\n\" +
+            \"Make sure the page is running on HTTPS or localhost.\"
         );
         return;
       }
 
-      if (error.name === "NetworkError") {
+      if (error.name === \"NetworkError\") {
         alert(
-          "Could not connect to MT580P2.\n\n" +
-            "Make sure the printer is powered on and paired."
+          \"Could not connect to MT580P2.\\n\\n\" +
+            \"Make sure the printer is powered on and paired.\"
         );
         return;
       }
 
-      alert(`Could not print KOT.\n\n${error.message}`);
+      alert(`Could not print KOT.\\n\\n${error.message}`);
     } finally {
       setIsPrinting(false);
     }
   };
 
-  const regularTables = tables.filter(table => String(table.id).toLowerCase() !== 'parcel');
-  const parcelTable = tables.find(table => String(table.id).toLowerCase() === 'parcel');
+  const regularTables = tables.filter(table => String(table.id).toLowerCase() !== \'parcel\');
+  const parcelTable = tables.find(table => String(table.id).toLowerCase() === \'parcel\');
   const groupedMenu = menu.reduce((acc, item) => {
-    const category = item.category || 'Uncategorized';
+    const category = item.category || \'Uncategorized\';
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -1410,29 +1410,29 @@ export default function ManagerPage() {
 
   return (
     <div
-      className="
+      className=\"
         p-5
         md:p-10
         bg-[#e9e3d9]
         min-h-screen
         font-[var(--font-playfair)]
         text-[#333]
-      "
+      \"
     >
 
       {/* HEADER */}
 
-      <h1 className="text-center mb-8 text-4xl font-bold">
-        Manager's Dashboard
+      <h1 className=\"text-center mb-8 text-4xl font-bold\">
+        Manager\'s Dashboard
       </h1>
 
       {/* PRINTER STATUS */}
 
       {connectedPrinter && (
-        <div className="max-w-7xl mx-auto mb-5">
-          <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg">
+        <div className=\"max-w-7xl mx-auto mb-5\">
+          <div className=\"bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg\">
             Bluetooth printer connected:
-            <strong className="ml-2">
+            <strong className=\"ml-2\">
               {connectedPrinter}
             </strong>
           </div>
@@ -1441,21 +1441,21 @@ export default function ManagerPage() {
 
       {/* TABLE OVERVIEW */}
 
-      <div className="max-w-7xl mx-auto">
+      <div className=\"max-w-7xl mx-auto\">
 
-        <h2 className="text-3xl font-bold mb-4">
+        <h2 className=\"text-3xl font-bold mb-4\">
           Table Overview
         </h2>
 
         <div
-          className="
+          className=\"
             grid
             grid-cols-1
             md:grid-cols-2
             lg:grid-cols-3
             xl:grid-cols-4
             gap-6
-          "
+          \"
         >
 
           {regularTables.map(table => (
@@ -1468,22 +1468,22 @@ export default function ManagerPage() {
                 shadow-md
                 ${
                   table.occupied
-                    ? 'bg-red-100 border-red-400'
-                    : 'bg-green-100 border-green-400'
+                    ? \'bg-red-100 border-red-400\'
+                    : \'bg-green-100 border-green-400\'
                 }
                 border-2
               `}
             >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold mb-2">
-                Table {table.id} -{' '}
+            <div className=\"flex items-center justify-between\">
+              <h3 className=\"text-xl font-bold mb-2\">
+                Table {table.id} -{\' \'}
                 {table.occupied
-                  ? 'Occupied'
-                  : 'Available'}
+                  ? \'Occupied\'
+                  : \'Available\'}
               </h3>
-              <a href={`http://theitalianbistrro.in/customer/${table.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              <a href={`http://theitalianbistrro.in/customer/${table.id}`} target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-blue-500 hover:text-blue-700\">
+                <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">
+                  <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\" />
                 </svg>
               </a>
             </div>
@@ -1493,16 +1493,16 @@ export default function ManagerPage() {
 
                 <div>
 
-                  <p className="font-bold text-lg">
+                  <p className=\"font-bold text-lg\">
                     Total Bill: ₹
                     {Number(
                       table.totalBill || 0
                     ).toFixed(2)}
                   </p>
 
-                  <div className="mt-2">
+                  <div className=\"mt-2\">
 
-                    <h4 className="font-bold">
+                    <h4 className=\"font-bold\">
                       Current Orders:
                     </h4>
 
@@ -1518,32 +1518,32 @@ export default function ManagerPage() {
 
                         <div
                           key={order.id}
-                          className="
+                          className=\"
                             mt-2
                             pl-4
                             border-l-2
                             border-gray-400
-                          "
+                          \"
                         >
-                           <div className="flex items-center">
-                            <p className="font-semibold">
+                           <div className=\"flex items-center\">
+                            <p className=\"font-semibold\">
                               Order #{order.orderNumber}
-                              {' - '}
-                              <span className="font-normal">
+                              {\' - \'}
+                              <span className=\"font-normal\">
                                 {order.status}
                               </span>
                             </p>
-                            <button onClick={() => handleEditOrder(order)} className="text-blue-500 hover:text-blue-700 ml-2">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            <button onClick={() => handleEditOrder(order)} className=\"text-blue-500 hover:text-blue-700 ml-2\">
+                              <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">
+                                <path d=\"M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z\" />
                               </svg>
                             </button>
                           </div>
 
                           <ul
-                            className="
+                            className=\"
                               text-sm
-                            "
+                            \"
                           >
 
                             {order.items.map(
@@ -1554,7 +1554,7 @@ export default function ManagerPage() {
 
                                 <li
                                   key={index}
-                                  className="flex justify-between"
+                                  className=\"flex justify-between\"
                                 >
                                   <span>{item.name} x {item.quantity}</span>
                                   <span>₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
@@ -1567,11 +1567,11 @@ export default function ManagerPage() {
 
                         </div>
 
-                      ))}
+                      ))}\
 
                   </div>
 
-                  <div className="flex gap-2 mt-4">
+                  <div className=\"flex gap-2 mt-4\">
 
                     <button
                       onClick={() =>
@@ -1579,7 +1579,7 @@ export default function ManagerPage() {
                           table.id
                         )
                       }
-                      className="
+                      className=\"
                         w-full
                         bg-green-500
                         text-white
@@ -1588,7 +1588,7 @@ export default function ManagerPage() {
                         rounded-md
                         hover:bg-green-600
                         transition-colors
-                      "
+                      \"
                     >
                       Paid
                     </button>
@@ -1602,7 +1602,7 @@ export default function ManagerPage() {
                       disabled={
                         isPrinting
                       }
-                      className="
+                      className=\"
                         w-full
                         bg-blue-500
                         text-white
@@ -1613,16 +1613,16 @@ export default function ManagerPage() {
                         transition-colors
                         disabled:opacity-50
                         disabled:cursor-not-allowed
-                      "
+                      \"
                     >
                       {isPrinting
-                        ? 'Printing...'
-                        : 'Print'}
+                        ? \'Printing...\'
+                        : \'Print\'}
                     </button>
                     <button
                       onClick={() => handlePrintKot(table)}
                       disabled={isPrinting}
-                      className="
+                      className=\"
                         w-full
                         bg-orange-500
                         text-white
@@ -1633,19 +1633,19 @@ export default function ManagerPage() {
                         transition-colors
                         disabled:opacity-50
                         disabled:cursor-not-allowed
-                      "
+                      \"
                     >
-                      {isPrinting ? "Printing..." : "KOT"}
+                      {isPrinting ? \"Printing...\" : \"KOT\"}
                     </button>
                   </div>
 
                 </div>
 
-              )}
+              )}\
 
             </div>
 
-          ))}
+          ))}\
 
         </div>
 
@@ -1653,11 +1653,11 @@ export default function ManagerPage() {
 
       {/* PARCEL ORDERS */}
       {parcelTable && parcelTable.occupied && (
-        <div className="max-w-7xl mx-auto mt-10">
-          <h2 className="text-3xl font-bold mb-4">
+        <div className=\"max-w-7xl mx-auto mt-10\">
+          <h2 className=\"text-3xl font-bold mb-4\">
             Parcels
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6\">
             {orders
               .filter(
                 order =>
@@ -1667,129 +1667,129 @@ export default function ManagerPage() {
               .map(order => (
                 <div
                   key={order.id}
-                  className="p-4 rounded-lg shadow-md bg-blue-100 border-blue-400 border-2"
+                  className=\"p-4 rounded-lg shadow-md bg-blue-100 border-blue-400 border-2\"
                 >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold mb-2">
+                  <div className=\"flex items-center justify-between\">
+                    <h3 className=\"text-xl font-bold mb-2\">
                       Parcel Order #{order.orderNumber}
                     </h3>
-                    <button onClick={() => handleEditOrder(order)} className="text-blue-500 hover:text-blue-700 ml-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    <button onClick={() => handleEditOrder(order)} className=\"text-blue-500 hover:text-blue-700 ml-2\">
+                      <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">
+                        <path d=\"M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z\" />
                       </svg>
                     </button>
                   </div>
                   <div>
-                    <ul className="text-sm">
+                    <ul className=\"text-sm\">
                       {order.items.map((item, index) => (
                         <li
                           key={index}
-                          className="flex justify-between"
+                          className=\"flex justify-between\"
                         >
                           <span>{item.name} x {item.quantity}</span>
                           <span>₹{(Number(item.price || 0) * item.quantity).toFixed(2)}</span>
                         </li>
-                      ))}
+                      ))}\
                       {order.parcelCharge > 0 && (
-                        <li className="flex justify-between font-bold">
+                        <li className=\"flex justify-between font-bold\">
                           <span>Parcel Charge</span>
                           <span>₹{order.parcelCharge.toFixed(2)}</span>
                         </li>
-                      )}
-                      <li className="flex justify-between font-bold border-t mt-1 pt-1">
+                      )}\
+                      <li className=\"flex justify-between font-bold border-t mt-1 pt-1\">
                         <span>Total</span>
                         <span>₹{order.total.toFixed(2)}</span>
                       </li>
                     </ul>
                   </div>
-                  <div className="flex gap-2 mt-4">
+                  <div className=\"flex gap-2 mt-4\">
                     <button
                       onClick={() => handleParcelPaid(order.id)}
-                      className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+                      className=\"w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors\"
                     >
                       Paid
                     </button>
                     <button
                       onClick={() => handlePrint({ ...parcelTable, id: `Parcel #${order.orderNumber}`, orderIds: [order.id], totalBill: order.total })}
                       disabled={isPrinting}
-                      className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className=\"w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"
                     >
-                      {isPrinting ? 'Printing...' : 'Print'}
+                      {isPrinting ? \'Printing...\' : \'Print\'}
                     </button>
                     <button
                       onClick={() => handlePrintKot({ ...parcelTable, id: `Parcel #${order.orderNumber}`, orderIds: [order.id] })}
                       disabled={isPrinting}
-                      className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className=\"w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"
                     >
-                      {isPrinting ? "Printing..." : "KOT"}
+                      {isPrinting ? \"Printing...\" : \"KOT\"}
                     </button>
                   </div>
                 </div>
-              ))}
+              ))}\
           </div>
         </div>
-      )}
+      )}\
 
 
       {editingOrder && (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-        <div className="bg-white p-5 rounded-lg shadow-xl m-4 max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">Edit Order #{editingOrder.orderNumber}</h2>
+    <div className=\"fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center\">
+        <div className=\"bg-white p-5 rounded-lg shadow-xl m-4 max-w-lg w-full\">
+            <h2 className=\"text-2xl font-bold mb-4\">Edit Order #{editingOrder.orderNumber}</h2>
 
-            <div className="mb-4">
-                <h3 className="text-lg font-semibold">Current Items</h3>
+            <div className=\"mb-4\">
+                <h3 className=\"text-lg font-semibold\">Current Items</h3>
                 <ul>
                     {editingOrder.items.map((item, index) => (
-                        <li key={index} className="flex justify-between items-center mb-2">
-                           <div class="flex items-center">
-                              <span class="w-2/3">{item.name}</span>
-                              <div class="flex items-center">
-                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity - 1)} class="px-2 py-1 border rounded-md">-</button>
-                                 <span class="px-3">{item.quantity}</span>
-                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity + 1)} class="px-2 py-1 border rounded-md">+</button>
+                        <li key={index} className=\"flex justify-between items-center mb-2\">
+                           <div class=\"flex items-center\">
+                              <span class=\"w-2/3\">{item.name}</span>
+                              <div class=\"flex items-center\">
+                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity - 1)} class=\"px-2 py-1 border rounded-md\">-</button>
+                                 <span class=\"px-3\">{item.quantity}</span>
+                                 <button onClick={() => handleOrderItemQuantityChange(index, item.quantity + 1)} class=\"px-2 py-1 border rounded-md\">+</button>
                               </div>
                            </div>
-                           <button onClick={() => handleDeleteOrderItem(index)} className="text-red-500 hover:text-red-700">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                           <button onClick={() => handleDeleteOrderItem(index)} className=\"text-red-500 hover:text-red-700\">
+                              <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">
+                                 <path fillRule=\"evenodd\" d=\"M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z\" clipRule=\"evenodd\" />
                               </svg>
                            </button>
                         </li>
-                    ))}
+                    ))}\
                 </ul>
             </div>
 
-            <div className="mb-4">
-                <h3 className="text-lg font-semibold">Add Item</h3>
-                <select onChange={(e) => handleAddOrderItemToOrder(JSON.parse(e.target.value))} className="w-full p-2 border rounded-md">
-                    <option value="">Select an item</option>
+            <div className=\"mb-4\">
+                <h3 className=\"text-lg font-semibold\">Add Item</h3>
+                <select onChange={(e) => handleAddOrderItemToOrder(JSON.parse(e.target.value))} className=\"w-full p-2 border rounded-md\">
+                    <option value=\"\">Select an item</option>
                     {menu.map(item => (
                         <option key={item.id} value={JSON.stringify(item)}>
                             {item.name} - ₹{Number(item.price || 0).toFixed(2)}
                         </option>
-                    ))}
+                    ))}\
                 </select>
             </div>
 
-            <div className="flex justify-end gap-4 mt-4">
-                <button onClick={() => setEditingOrder(null)} className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+            <div className=\"flex justify-end gap-4 mt-4\">
+                <button onClick={() => setEditingOrder(null)} className=\"bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600\">
                     Cancel
                 </button>
-                <button onClick={() => handleDeleteOrder(editingOrder.id)} className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+                <button onClick={() => handleDeleteOrder(editingOrder.id)} className=\"bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600\">
                     Delete Order
                 </button>
-                <button onClick={handleUpdateOrder} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                <button onClick={handleUpdateOrder} className=\"bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600\">
                     Update Order
                 </button>
             </div>
         </div>
     </div>
-)}
+)}\
 
 
       {/* MENU MANAGEMENT */}
 
-      <div className="max-w-7xl mx-auto mt-10">
+      <div className=\"max-w-7xl mx-auto mt-10\">
 
         <div
           onClick={() =>
@@ -1797,7 +1797,7 @@ export default function ManagerPage() {
               !isMenuExpanded
             )
           }
-          className="
+          className=\"
             cursor-pointer
             bg-[#f8f1e7]
             p-4
@@ -1806,17 +1806,17 @@ export default function ManagerPage() {
             flex
             justify-between
             items-center
-          "
+          \"
         >
 
-          <h2 className="text-3xl font-bold">
+          <h2 className=\"text-3xl font-bold\">
             Menu Management
           </h2>
 
-          <span className="text-2xl font-bold">
+          <span className=\"text-2xl font-bold\">
             {isMenuExpanded
-              ? '▲'
-              : '▼'}
+              ? \'▲\'
+              : \'▼\'}\
           </span>
 
         </div>
@@ -1825,7 +1825,7 @@ export default function ManagerPage() {
 
           <div>
 
-            <div className="mt-4">
+            <div className=\"mt-4\">
 
               <button
                 onClick={() =>
@@ -1833,7 +1833,7 @@ export default function ManagerPage() {
                     !showAddItemForm
                   )
                 }
-                className="
+                className=\"
                   bg-blue-500
                   text-white
                   px-4
@@ -1841,11 +1841,11 @@ export default function ManagerPage() {
                   rounded-md
                   hover:bg-blue-600
                   transition-colors
-                "
+                \"
               >
                 {showAddItemForm
-                  ? 'Cancel'
-                  : 'Add New Item'}
+                  ? \'Cancel\'
+                  : \'Add New Item\'}\
               </button>
 
               {showAddItemForm && (
@@ -1854,26 +1854,26 @@ export default function ManagerPage() {
                   onSubmit={
                     handleAddMenuItem
                   }
-                  className="
+                  className=\"
                     mt-4
                     p-4
                     bg-white
                     rounded-lg
                     shadow-md
-                  "
+                  \"
                 >
 
                   <div
-                    className="
+                    className=\"
                       grid
                       grid-cols-1
                       md:grid-cols-2
                       gap-4
-                    "
+                    \"
                   >
 
                     <input
-                      type="text"
+                      type=\"text\"
                       value={
                         newItemName
                       }
@@ -1882,17 +1882,17 @@ export default function ManagerPage() {
                           e.target.value
                         )
                       }
-                      placeholder="Item Name"
-                      className="
+                      placeholder=\"Item Name\"
+                      className=\"
                         p-2
                         border
                         rounded-md
-                      "
+                      \"
                       required
                     />
 
                     <input
-                      type="number"
+                      type=\"number\"
                       value={
                         newItemPrice
                       }
@@ -1901,18 +1901,18 @@ export default function ManagerPage() {
                           e.target.value
                         )
                       }
-                      placeholder="Price"
-                      className="
+                      placeholder=\"Price\"
+                      className=\"
                         p-2
                         border
                         rounded-md
-                      "
+                      \"
                       required
-                      step="0.01"
+                      step=\"0.01\"
                     />
 
                     <input
-                      type="text"
+                      type=\"text\"
                       value={
                         newItemCategory
                       }
@@ -1921,25 +1921,25 @@ export default function ManagerPage() {
                           e.target.value
                         )
                       }
-                      placeholder="Category"
-                      className="
+                      placeholder=\"Category\"
+                      className=\"
                         p-2
                         border
                         rounded-md
-                      "
+                      \"
                       required
                     />
 
                     <input
-                      type="file"
+                      type=\"file\"
                       onChange={
                         handleImageChange
                       }
-                      className="
+                      className=\"
                         p-2
                         border
                         rounded-md
-                      "
+                      \"
                       disabled={
                         uploading
                       }
@@ -1948,8 +1948,8 @@ export default function ManagerPage() {
                   </div>
 
                   <button
-                    type="submit"
-                    className="
+                    type=\"submit\"
+                    className=\"
                       mt-4
                       w-full
                       bg-green-500
@@ -1959,168 +1959,168 @@ export default function ManagerPage() {
                       rounded-md
                       hover:bg-green-600
                       transition-colors
-                    "
+                    \"
                     disabled={
                       uploading ||
                       isSubmitting
                     }
                   >
                     {uploading
-                      ? 'Uploading...'
+                      ? \'Uploading...\'
                       : isSubmitting
-                        ? 'Adding...'
-                        : 'Add Item'}
+                        ? \'Adding...\'
+                        : \'Add Item\'}\
                   </button>
 
                 </form>
 
-              )}
+              )}\
 
             </div>
 
             {Object.entries(groupedMenu).map(([category, items]) => (
-              <div key={category} className="mt-6">
-                <h3 className="text-2xl font-bold mb-4 capitalize">{category}</h3>
+              <div key={category} className=\"mt-6\">
+                <h3 className=\"text-2xl font-bold mb-4 capitalize\">{category}</h3>
                 <div
-                  className="
+                  className=\"
                     grid
                     grid-cols-1
                     md:grid-cols-2
                     lg:grid-cols-3
                     xl:grid-cols-4
                     gap-6
-                  "
+                  \"
                 >
                   {items.map(item => (
                     <div
                       key={item.id}
-                      className="
+                      className=\"
                         bg-[#f8f1e7]
                         p-4
                         rounded-lg
                         shadow-md
-                      "
+                      \"
                     >
                       {editingItem && editingItem.id === item.id ? (
                         <form
                           onSubmit={handleUpdateMenuItem}
                         >
                           <img
-                            src={editingItem.image || '/placeholder.png'}
+                            src={editingItem.image || \'/placeholder.png\'}
                             alt={editingItem.name}
-                            className="
+                            className=\"
                               w-full
                               h-32
                               object-cover
                               mb-4
                               rounded-md
-                            "
+                            \"
                           />
                           <input
-                            type="text"
+                            type=\"text\"
                             value={editingItem.name}
                             onChange={e =>
                               setEditingItem(
                                 prev => ({ ...prev, name: e.target.value })
                               )
                             }
-                            placeholder="Item Name"
-                            className="
+                            placeholder=\"Item Name\"
+                            className=\"
                               w-full
                               p-2
                               border
                               rounded-md
                               mb-2
-                            "
+                            \"
                             required
                           />
                           <input
-                            type="number"
+                            type=\"number\"
                             value={editingItem.price}
                             onChange={e =>
                               setEditingItem(
                                 prev => ({ ...prev, price: e.target.value })
                               )
                             }
-                            placeholder="Price"
-                            className="
+                            placeholder=\"Price\"
+                            className=\"
                               w-full
                               p-2
                               border
                               rounded-md
                               mb-2
-                            "
+                            \"
                             required
-                            step="0.01"
+                            step=\"0.01\"
                           />
                           <input
-                            type="text"
+                            type=\"text\"
                             value={editingItem.category}
                             onChange={e =>
                               setEditingItem(
                                 prev => ({ ...prev, category: e.target.value })
                               )
                             }
-                            placeholder="Category"
-                            className="
+                            placeholder=\"Category\"
+                            className=\"
                               w-full
                               p-2
                               border
                               rounded-md
                               mb-2
-                            "
+                            \"
                             required
                           />
                           <input
-                            type="file"
+                            type=\"file\"
                             onChange={handleImageChange}
-                            className="
+                            className=\"
                               w-full
                               p-2
                               border
                               rounded-md
                               mb-4
-                            "
+                            \"
                             disabled={uploading}
                           />
                           <div
-                            className="
+                            className=\"
                               flex
                               justify-end
                               gap-2
-                            "
+                            \"
                           >
                             <button
-                              type="button"
+                              type=\"button\"
                               onClick={() => setEditingItem(null)}
-                              className="
+                              className=\"
                                 bg-gray-500
                                 text-white
                                 px-4
                                 py-2
                                 rounded-md
                                 hover:bg-gray-600
-                              "
+                              \"
                             >
                               Cancel
                             </button>
                             <button
-                              type="submit"
-                              className="
+                              type=\"submit\"
+                              className=\"
                                 bg-green-500
                                 text-white
                                 px-4
                                 py-2
                                 rounded-md
                                 hover:bg-green-600
-                              "
+                              \"
                               disabled={uploading || isSubmitting}
                             >
                               {uploading
-                                ? 'Uploading...'
+                                ? \'Uploading...\'
                                 : isSubmitting
-                                  ? 'Saving...'
-                                  : 'Save'}
+                                  ? \'Saving...\'
+                                  : \'Save\'}\
                             </button>
                           </div>
                         </form>
@@ -2130,33 +2130,33 @@ export default function ManagerPage() {
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="
+                              className=\"
                                 w-full
                                 h-32
                                 object-cover
                                 mb-4
                                 rounded-md
-                              "
+                              \"
                             />
-                          )}
-                          <h3 className="text-lg font-bold">{item.name}</h3>
+                          )}\
+                          <h3 className=\"text-lg font-bold\">{item.name}</h3>
                           <p>
                             ₹{Number(item.price || 0).toFixed(2)}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className=\"text-sm text-gray-600\">
                             {item.category}
                           </p>
                           <div
-                            className="
+                            className=\"
                               flex
                               justify-end
                               gap-2
                               mt-4
-                            "
+                            \"
                           >
                             <button
                               onClick={() => setEditingItem(item)}
-                              className="
+                              className=\"
                                 w-full
                                 bg-yellow-500
                                 text-white
@@ -2165,7 +2165,7 @@ export default function ManagerPage() {
                                 rounded-md
                                 hover:bg-yellow-600
                                 transition-colors
-                              "
+                              \"
                             >
                               Edit
                             </button>
@@ -2173,15 +2173,15 @@ export default function ManagerPage() {
                               onClick={() => handleToggleAvailability(item)}
                               className={`w-full text-white px-4 py-2 rounded-md transition-colors ${
                                   (item.isAvailable ?? true)
-                                      ? 'bg-orange-500 hover:bg-orange-600'
-                                      : 'bg-green-500 hover:bg-green-600'
+                                      ? \'bg-orange-500 hover:bg-orange-600\'
+                                      : \'bg-green-500 hover:bg-green-600\'
                               }`}
                               >
-                              {(item.isAvailable ?? true) ? 'Unavailable' : 'Available'}
+                              {(item.isAvailable ?? true) ? \'Unavailable\' : \'Available\'}\
                             </button>
                             <button
                               onClick={() => handleDeleteMenuItem(item.id)}
-                              className="
+                              className=\"
                                 w-full
                                 bg-red-500
                                 text-white
@@ -2190,23 +2190,23 @@ export default function ManagerPage() {
                                 rounded-md
                                 hover:bg-red-600
                                 transition-colors
-                              "
+                              \"
                               disabled={isDeleting[item.id]}
                             >
                               {isDeleting[item.id]
-                                ? 'Deleting...'
-                                : 'Delete'}
+                                ? \'Deleting...\'
+                                : \'Delete\'}\
                             </button>
                           </div>
                         </div>
-                      )}
+                      )}\
                     </div>
-                  ))}
+                  ))}\
                 </div>
               </div>
-            ))}
+            ))}\
           </div>
-        )}
+        )}\
       </div>
     </div>
   );

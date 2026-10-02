@@ -20,7 +20,7 @@ async function getMenu() {
 
 export async function GET() {
     const ordersCollection = db.collection('orders');
-    const snapshot = await ordersCollection.get();
+    const snapshot = await ordersCollection.where('status', 'in', ['accepted', 'preparing', 'completed']).get();
     if (snapshot.empty) {
         return NextResponse.json([]);
     }
