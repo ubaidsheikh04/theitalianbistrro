@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { db } from '@/database';
 
@@ -18,9 +17,24 @@ async function getMenu() {
     return menu;
 }
 
-export async function GET() {
-    const ordersCollection = db.collection('orders');
-    const snapshot = await ordersCollection.where('status', 'in', ['accepted', 'preparing', 'completed']).get();
+export async function GET(request) {
+    const { searchParams } = new URL(request.url);
+    const view = searchParams.get('view');
+
+    let statuses;
+    if (view === 'kitchen') {
+        // For the kitchen, we need to show all orders that need action.
+        // This includes accepted, preparing, and completed (to be marked as served).
+        statuses = ['accepted', 'preparing', 'completed'];
+    } else {
+        // For the manager, we need to show all active orders for a table.
+        // This includes served orders until the table is paid.
+        statuses = ['accepted', 'preparing', 'completed', 'served'];
+    }
+
+    const ordersCollection = db.collection('orders').where('status', 'in', statuses);
+    const snapshot = await ordersCollection.get();
+
     if (snapshot.empty) {
         return NextResponse.json([]);
     }
@@ -60,7 +74,6 @@ export async function POST(request) {
         const finalOrderTotal = orderTotal + parcelCharge;
 
         await db.runTransaction(async (transaction) => {
-            // All reads must be executed before all writes.
             const counterDoc = await transaction.get(counterRef);
             const tableId = String(tableNumber);
             const tableRef = db.collection('tables').doc(tableId);
@@ -72,7 +85,6 @@ export async function POST(request) {
             }
             newOrderNumber = lastOrderNumber + 1;
 
-            // Now, perform all write operations.
             transaction.set(newOrderRef, {
                 orderNumber: newOrderNumber,
                 createdAt: new Date().toISOString(),

@@ -46,11 +46,10 @@ export default function KitchenPage() {
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = () => {
-    fetch('/api/orders')
+    fetch('/api/orders?view=kitchen')
       .then(res => res.json())
       .then(data => {
-        const activeOrders = data.filter(o => o.status === 'accepted' || o.status === 'preparing' || o.status === 'completed');
-        setOrders(activeOrders);
+        setOrders(data);
       })
       .catch(error => console.error('Error fetching orders:', error));
   };
