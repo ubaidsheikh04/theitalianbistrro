@@ -7,6 +7,7 @@ import {
   uploadBytes,
   getDownloadURL
 } from 'firebase/storage';
+import { shouldRefresh } from '@/utils/time';
 
 export default function ManagerPage() {
   const [tables, setTables] = useState([]);
@@ -78,13 +79,16 @@ export default function ManagerPage() {
 
 
   useEffect(() => {
-    fetchOrdersAndTables();
+    if (shouldRefresh()) {
+        fetchOrdersAndTables();
+    }
     fetchMenu();
 
-    const interval = setInterval(
-      fetchOrdersAndTables,
-      30000
-    );
+    const interval = setInterval(() => {
+        if (shouldRefresh()) {
+            fetchOrdersAndTables();
+        }
+    }, 30000);
 
     return () =>
       clearInterval(interval);

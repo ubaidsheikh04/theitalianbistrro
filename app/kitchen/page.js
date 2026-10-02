@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { shouldRefresh } from '@/utils/time';
 
 function Order({ order, markAsPreparing, markAsCompleted, markAsServed }) {
   return (
@@ -55,8 +56,14 @@ export default function KitchenPage() {
   };
 
   useEffect(() => {
-    fetchOrders();
-    const intervalId = setInterval(fetchOrders, 600000);
+    if (shouldRefresh()) {
+      fetchOrders();
+    }
+    const intervalId = setInterval(() => {
+        if (shouldRefresh()) {
+            fetchOrders();
+        }
+    }, 600000);
 
     return () => clearInterval(intervalId);
   }, []);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { shouldRefresh } from '@/utils/time';
 
 export default function OrbPage() {
   const [orders, setOrders] = useState([]);
@@ -26,11 +27,15 @@ export default function OrbPage() {
       }
     };
 
-    // Fetch immediately when page opens
-    fetchOrders();
+    if (shouldRefresh()) {
+      fetchOrders();
+    }
 
-    // Then refresh every 10 minutes
-    const interval = setInterval(fetchOrders, 600000);
+    const interval = setInterval(() => {
+      if (shouldRefresh()) {
+        fetchOrders();
+      }
+    }, 600000);
 
     return () => clearInterval(interval);
   }, []);
