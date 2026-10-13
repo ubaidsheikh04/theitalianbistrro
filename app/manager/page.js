@@ -43,7 +43,7 @@ export default function ManagerPage() {
         ordersRes,
         tablesRes,
       ] = await Promise.all([
-        fetch('/api/orders'),
+        fetch('/api/manager/orders'),
         fetch('/api/tables'),
       ]);
 
