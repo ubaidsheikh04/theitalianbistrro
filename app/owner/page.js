@@ -12,6 +12,18 @@ export default function OwnerPage() {
     const [customRange, setCustomRange] = useState({ from: '', to: '' });
     const [selectedOrder, setSelectedOrder] = useState(null);
 
+    const getMonthDateRange = (month) => {
+        const [year, monthNumber] = month.split('-').map(Number);
+    
+        // Get the number of days in the selected month.
+        const lastDay = new Date(year, monthNumber, 0).getDate();
+    
+        return {
+            from: `${month}-01`,
+            to: `${month}-${String(lastDay).padStart(2, '0')}`
+        };
+    };
+
     const fetchSummaryStats = () => {
         if (!summaryStats) setLoadingSummary(true);
         fetch('/api/owner/stats', { cache: 'no-store' })
@@ -57,8 +69,7 @@ export default function OwnerPage() {
         if (newTimeframe === 'daily') {
             fetchAnalytics({ date: selectedDate });
         } else if (newTimeframe === 'monthly') {
-            const from = `${selectedMonth}-01`;
-            const to = new Date(new Date(from).getFullYear(), new Date(from).getMonth() + 1, 0).toISOString().split('T')[0];
+            const { from, to } = getMonthDateRange(selectedMonth);
             fetchAnalytics({ from, to });
         }
         // For custom, the fetch is triggered by the button
@@ -76,8 +87,7 @@ export default function OwnerPage() {
         const newMonth = e.target.value;
         setSelectedMonth(newMonth);
         if (timeframe === 'monthly') {
-            const from = `${newMonth}-01`;
-            const to = new Date(new Date(from).getFullYear(), new Date(from).getMonth() + 1, 0).toISOString().split('T')[0];
+            const { from, to } = getMonthDateRange(newMonth);
             fetchAnalytics({ from, to });
         }
     };
