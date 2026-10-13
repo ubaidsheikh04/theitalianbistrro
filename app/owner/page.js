@@ -11,6 +11,9 @@ export default function OwnerPage() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
     const [customRange, setCustomRange] = useState({ from: '', to: '' });
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [enteredPassword, setEnteredPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
     const getMonthDateRange = (month) => {
         const [year, monthNumber] = month.split('-').map(Number);
@@ -54,14 +57,27 @@ export default function OwnerPage() {
     };
 
     useEffect(() => {
+        if (!isAuthenticated) return;
+    
         fetchSummaryStats();
-        // Initial fetch for the default view (daily)
         fetchAnalytics({ date: selectedDate });
-
-        const summaryInterval = setInterval(fetchSummaryStats, 600000); // Refresh summary every 10 mins
-
+    
+        const summaryInterval = setInterval(fetchSummaryStats, 600000);
+    
         return () => clearInterval(summaryInterval);
-    }, []);
+    }, [isAuthenticated]);
+
+    const handlePasswordSubmit = (e) => {
+        e.preventDefault();
+    
+        if (enteredPassword === 'Ubaid@123') {
+            setPasswordError('');
+            setIsAuthenticated(true);
+        } else {
+            setPasswordError('Incorrect password. Please try again.');
+            setEnteredPassword('');
+        }
+    };
 
     const handleTimeframeChange = (newTimeframe) => {
         setTimeframe(newTimeframe);
@@ -162,6 +178,48 @@ export default function OwnerPage() {
         );
     };
     
+    if (!isAuthenticated) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                <form
+                    onSubmit={handlePasswordSubmit}
+                    className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl"
+                >
+                    <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                        Owner Dashboard
+                    </h2>
+    
+                    <p className="mb-6 text-gray-500">
+                        Enter your password to access analytics.
+                    </p>
+    
+                    <input
+                        type="password"
+                        value={enteredPassword}
+                        onChange={(e) => setEnteredPassword(e.target.value)}
+                        placeholder="Enter password"
+                        autoFocus
+                        required
+                        className="mb-3 w-full rounded-lg border p-3 outline-none focus:border-blue-600"
+                    />
+    
+                    {passwordError && (
+                        <p className="mb-3 text-sm text-red-600">
+                            {passwordError}
+                        </p>
+                    )}
+    
+                    <button
+                        type="submit"
+                        className="w-full rounded-lg bg-blue-600 p-3 font-semibold text-white hover:bg-blue-700"
+                    >
+                        Unlock Dashboard
+                    </button>
+                </form>
+            </div>
+        );
+    }
+
     return (
         <div className="p-4 md:p-8 bg-gray-100 min-h-screen font-sans text-gray-800">
             <header className="flex justify-between items-center mb-6">
