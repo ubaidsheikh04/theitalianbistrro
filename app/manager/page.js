@@ -79,20 +79,40 @@ export default function ManagerPage() {
 
 
   useEffect(() => {
-    if (shouldRefresh()) {
-        fetchOrdersAndTables();
-    }
-    fetchMenu();
-
-    const interval = setInterval(() => {
-        if (shouldRefresh()) {
+    const refreshData = () => {
+        // Avoid unnecessary API requests while the tab is hidden.
+        if (
+            document.visibilityState === 'visible' &&
+            shouldRefresh()
+        ) {
             fetchOrdersAndTables();
         }
-    }, 30000);
+    };
 
-    return () =>
-      clearInterval(interval);
-  }, []);
+    // Load the dashboard and menu on initial mount.
+    refreshData();
+    fetchMenu();
+
+    // Continue polling every 30 seconds while the tab is visible.
+    const interval = setInterval(refreshData, 30000);
+
+    // Refresh immediately when the user returns to this tab.
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            refreshData();
+        }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+        clearInterval(interval);
+        document.removeEventListener(
+            'visibilitychange',
+            handleVisibilityChange
+        );
+    };
+}, []);
 
   /* ============================================================
      MARK TABLE PAID

@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
     const tablesCollection = db.collection('tables');
     const snapshot = await tablesCollection.get();
+    console.log('[Tables API] Documents returned:', snapshot.size);
     if (snapshot.empty) {
         return NextResponse.json([]);
     }

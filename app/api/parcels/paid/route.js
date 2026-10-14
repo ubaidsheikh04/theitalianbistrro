@@ -56,6 +56,13 @@ export async function POST(request) {
                 currentTotal - orderTotal
             );
 
+            // Mark the parcel order as paid.
+            if (orderDoc.exists) {
+                transaction.update(orderRef, {
+                    status: 'paid'
+                });
+            }
+
             // UPDATE PARCEL
             transaction.update(parcelRef, {
                 orderIds: remainingOrderIds,

@@ -58,6 +58,7 @@ export async function GET(request) {
 
     const ordersCollection = db.collection('orders').where('status', 'in', statuses);
     const snapshot = await ordersCollection.get();
+    console.log('[Orders API] Documents returned:', snapshot.size);
 
     if (snapshot.empty) {
         return NextResponse.json([]);
