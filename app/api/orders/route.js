@@ -1,21 +1,45 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/database';
 
-async function getMenu() {
+async function getMenu(itemIds) {
     const menuCollection = db.collection('menu');
-    const snapshot = await menuCollection.get();
-    if (snapshot.empty) {
-        return [];
+
+    if (!itemIds || itemIds.length === 0) {
+        // Fallback to fetching the entire menu if no itemIds are provided
+        const snapshot = await menuCollection.get();
+        if (snapshot.empty) {
+            return [];
+        }
+        const menu = [];
+        snapshot.forEach(doc => {
+            menu.push({ ...doc.data(), id: doc.id });
+        });
+        return menu;
     }
+
+    // Firestore 'in' queries are limited to 10 items.
+    // Chunk the itemIds to handle more than 10 items per order.
+    const itemChunks = [];
+    for (let i = 0; i < itemIds.length; i += 10) {
+        itemChunks.push(itemIds.slice(i, i + 10));
+    }
+
+    const menuPromises = itemChunks.map(chunk => {
+        return menuCollection.where('__name__', 'in', chunk).get();
+    });
+
+    const menuSnapshots = await Promise.all(menuPromises);
+
     const menu = [];
-    snapshot.forEach(doc => {
-        menu.push({
-            ...doc.data(),
-            id: doc.id,
+    menuSnapshots.forEach(snapshot => {
+        snapshot.forEach(doc => {
+            menu.push({ ...doc.data(), id: doc.id });
         });
     });
+
     return menu;
 }
+
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -49,7 +73,15 @@ export async function POST(request) {
     const { items, status, tableNumber } = await request.json();
 
     try {
-        const menu = await getMenu();
+        const itemIds = [...new Set(items.map(item => item.id))];
+        const menu = await getMenu(itemIds);
+
+        if (menu.length !== itemIds.length) {
+            const foundIds = menu.map(item => item.id);
+            const missingIds = itemIds.filter(id => !foundIds.includes(id));
+            throw new Error(`Menu items with ids ${missingIds.join(', ')} not found.`);
+        }
+
         const processedItems = items.map(item => {
             const menuItem = menu.find(m => m.id === item.id);
             if (!menuItem) {
