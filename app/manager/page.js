@@ -32,6 +32,7 @@ export default function ManagerPage() {
 
   const [isPrinting, setIsPrinting] = useState(false);
   const [connectedPrinter, setConnectedPrinter] = useState(null);
+  const [showConfirm, setShowConfirm] = useState({ show: false, action: null, message: '' });
 
   /* ============================================================
      FETCH DATA
@@ -118,55 +119,69 @@ export default function ManagerPage() {
      MARK TABLE PAID
   ============================================================ */
 
-  const handlePaid = async (tableId) => {
-    try {
-      const response = await fetch(
-        '/api/tables/paid',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            tableId
-          })
+  const handlePaid = (tableId) => {
+    setShowConfirm({
+      show: true,
+      message: 'Mark as Paid?',
+      action: async () => {
+        try {
+          const response = await fetch(
+            '/api/tables/paid',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                tableId
+              })
+            }
+          );
+
+          if (response.ok) {
+            await fetchOrdersAndTables();
+          }
+
+        } catch (error) {
+          console.error(
+            'Error marking table as paid:',
+            error
+          );
         }
-      );
-
-      if (response.ok) {
-        await fetchOrdersAndTables();
+        setShowConfirm({ show: false, action: null, message: '' });
       }
-
-    } catch (error) {
-      console.error(
-        'Error marking table as paid:',
-        error
-      );
-    }
+    });
   };
 
-  const handleParcelPaid = async (orderId) => {
-    const originalOrders = [...orders];
-    setOrders(currentOrders => currentOrders.filter(order => order.id !== orderId));
+  const handleParcelPaid = (orderId) => {
+    setShowConfirm({
+      show: true,
+      message: 'Mark as Paid?',
+      action: async () => {
+        const originalOrders = [...orders];
+        setOrders(currentOrders => currentOrders.filter(order => order.id !== orderId));
 
-    try {
-      const response = await fetch('/api/parcels/paid', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderId }),
-      });
+        try {
+          const response = await fetch('/api/parcels/paid', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId }),
+          });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to mark parcel order as paid');
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to mark parcel order as paid');
+          }
+        } catch (error) {
+          console.error('Error marking parcel order as paid:', error);
+          alert(`Failed to process payment: ${error.message}`);
+          setOrders(originalOrders);
+        }
+        setShowConfirm({ show: false, action: null, message: '' });
       }
-    } catch (error) {
-      console.error('Error marking parcel order as paid:', error);
-      alert(`Failed to process payment: ${error.message}`);
-      setOrders(originalOrders);
-    }
+    });
   };
 
   /* ============================================================
@@ -1443,6 +1458,32 @@ export default function ManagerPage() {
         text-[#333]
       "
     >
+
+      {showConfirm.show && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div className="bg-white p-5 rounded-lg shadow-xl m-4 max-w-sm w-full">
+                <h2 className="text-xl font-bold mb-4">{showConfirm.message}</h2>
+                <div className="flex justify-end gap-4">
+                    <button 
+                        onClick={() => setShowConfirm({ show: false, action: null, message: '' })}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                    >
+                        No
+                    </button>
+                    <button 
+                        onClick={() => {
+                            if (showConfirm.action) {
+                                showConfirm.action();
+                            }
+                        }}
+                        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                    >
+                        Yes
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
 
       {/* HEADER */}
 
